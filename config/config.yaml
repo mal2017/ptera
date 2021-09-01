@@ -1,3 +1,23 @@
 # housekeeping
 PEP: config/pep.yaml
 RUN_TYPE: test # full, test
+
+
+# Refs
+CONSENSUS_TE_FASTA: resources/Tidalbase_transposon_sequence.fasta.gz # must be gz
+FULL_TRANSCRIPT_FASTA: resources/dmel-all-transcript-r6.41.fasta.gz # must be gz
+GENOME_FASTA: resources/dmel-all-chromosome-r6.41.fasta.gz
+TRANSCRIPTOME_GTF: resources/dmel-all-r6.41.gtf
+
+# Salmon indices
+SALMON_K_PARAM: 31
+
+# Salmon vanilla (standard quant, mostly per salmon manual except no decoy indices)
+SALMON_VANILLA_BOOTSTRAPS: 100
+SALMON_VANILLA_LIBTYPE: SR # standard for dUTP, which the DGRP data is. Confirmed by aligning SAMN09738660 - reads map to (-) strand
+SALMON_VANILLA_SEQBIAS: TRUE
+SALMON_VANILLA_GCBIAS: TRUE
+SALMON_VANILLA_POSBIAS: TRUE
+SALMON_VANILLA_USE_AUXTARGETS: FALSE
+SALMON_VANILLA_USE_DECOYS: TRUE
+SALMON_VANILLA_SOFTCLIP: TRUE

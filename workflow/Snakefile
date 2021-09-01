@@ -11,14 +11,17 @@ pepfile: config.get("PEP")
 
 # concat SRRs
 
-SAMPLES = [x.sample_name for x in pep.samples]
+SAMPLES = [x.sample_name for x in pep.samples][:2]
 SUBSAMPLE_TABLE = pep.subsample_table
 
 rule all:
     input:
-        expand("results/reads/fastp/{s}_r1.trimmed.fq.gz",s="DGRP_Line_100_Female_SAMN09738660")
+        expand("results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/",s=SAMPLES),
+        "results/quantification/vanilla_salmon_tes_transcripts/terminus.done"
+        #expand("results/reads/fastp/{s}_r1.trimmed.fq.gz",s="DGRP_Line_100_Female_SAMN09738660")
         #expand("results/reads/dump/{s}/{e}/{r}/",s="DGRP_Line_100_Female_SAMN09738660",e=["SRX4483514"],r=['SRR7619150', 'SRR7619149'])
 
 include: "rules/download.smk"
 include: "rules/trim.smk"
 include: "rules/utils.smk"
+include: "rules/vanilla_salmon.smk"

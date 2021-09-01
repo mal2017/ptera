@@ -16,3 +16,17 @@ def get_experiments(sample):
     return list(set(pep.subsample_table[pep.subsample_table.sample_name == sample].Experiment))
 
 flatten = lambda t: [item for sublist in t for item in sublist]
+
+# ------------------------------------------------------------------------------
+# Utility Rules
+# ------------------------------------------------------------------------------
+
+rule make_transcripts_and_consensus_tes_fasta:
+    input:
+        tes = config.get("CONSENSUS_TE_FASTA"),
+        txs = config.get("FULL_TRANSCRIPT_FASTA")
+    output:
+        fa = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz",
+        dummy_decoy = touch("results/references/transcripts_and_consensus_tes/dummy_decoy.txt")
+    shell:
+        "cat {input.tes} {input.txs} > {output.fa}"
