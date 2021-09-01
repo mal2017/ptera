@@ -11,7 +11,9 @@ pepfile: config.get("PEP")
 
 # concat SRRs
 
-SAMPLES = [x.sample_name for x in pep.samples][:2]
+SAMPLES = [x.sample_name for x in pep.samples]
+SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:2]
+
 SUBSAMPLE_TABLE = pep.subsample_table
 
 rule all:

@@ -21,7 +21,13 @@ flatten = lambda t: [item for sublist in t for item in sublist]
 # Utility Rules
 # ------------------------------------------------------------------------------
 
+localrules: make_transcripts_and_consensus_tes_fasta
+
 rule make_transcripts_and_consensus_tes_fasta:
+    """
+    We generated the combined transcriptome reference by concatenating the set of transcript
+    sequences and the set of consensus TE sequences.
+    """
     input:
         tes = config.get("CONSENSUS_TE_FASTA"),
         txs = config.get("FULL_TRANSCRIPT_FASTA")

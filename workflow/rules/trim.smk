@@ -1,4 +1,8 @@
 rule fastp_trim_se:
+    """
+    We trimmed reads from the combined fastqs for each library with fastp with
+    default parameters.
+    """
     input:
         r1=rules.concat_runs.output
     output:
