@@ -228,3 +228,34 @@ rule vanilla_salmon_terminus_collapse:
         """
         terminus collapse -d {params.salm} -o {params.od}
         """
+
+rule vanilla_salmon_terminus_txp2group:
+    """
+    Sample 1 is used as a template for the tx2group files.
+    """
+    input:
+        coll = rules.vanilla_salmon_terminus_collapse.output,
+        grp = "results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/".format(s=SAMPLES[0]),
+        sf = "results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf".format(s=SAMPLES[0]),
+    output:
+        tx2group = temp("results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.raw.csv")
+    params:
+        cluster = "results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/clusters.txt".format(s=SAMPLES[0]),
+    shell:
+        """
+        python workflow/scripts/extract_txp_group.py {input.sf} {params.cluster} {output.tx2group}
+        """
+
+rule vanilla_salmon_terminus_txp2group_clean:
+    """
+    Sample 1 is used as a template for the tx2group files.
+    """
+    input:
+        raw = rules.vanilla_salmon_terminus_txp2group.output.tx2group,
+        tx2id = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2id,
+        tx2symbol = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2symbol,
+        tx2txsymbol = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2txsymbol,
+    output:
+        tx2group = "results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.tsv"
+    script:
+        "../scripts/clean_txp2group.R"

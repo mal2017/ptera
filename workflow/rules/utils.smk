@@ -36,3 +36,34 @@ rule make_transcripts_and_consensus_tes_fasta:
         dummy_decoy = touch("results/references/transcripts_and_consensus_tes/dummy_decoy.txt")
     shell:
         "cat {input.tes} {input.txs} > {output.fa}"
+
+rule make_transcripts_and_consensus_tes_gtf:
+    """
+    We generated the combined transcriptome reference by concatenating the set of transcript
+    sequences and the set of consensus TE sequences.
+    """
+    input:
+        te_fasta = config.get("CONSENSUS_TE_FASTA"),
+        host_gtf = config.get("TRANSCRIPTOME_GTF")
+    output:
+        gtf = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf",
+    singularity:
+        "docker://quay.io/biocontainers/bioconductor-rtracklayer:1.52.0--r41hd029910_0"
+    script:
+        "../scripts/make_transcripts_and_consensus_tes_gtf.R"
+
+rule make_transcripts_and_consensus_tes_tx2gene:
+    """
+    We generated the combined transcriptome reference by concatenating the set of transcript
+    sequences and the set of consensus TE sequences.
+    """
+    input:
+        gtf = rules.make_transcripts_and_consensus_tes_gtf.output.gtf
+    output:
+        tx2id = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2id.tsv",
+        tx2symbol = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2symbol.tsv",
+        tx2txsymbol = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2txsymbol.tsv",
+    singularity:
+        "docker://quay.io/biocontainers/bioconductor-rtracklayer:1.52.0--r41hd029910_0"
+    script:
+        "../scripts/make_transcripts_and_consensus_tes_tx2gene.R"

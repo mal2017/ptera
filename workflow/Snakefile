@@ -19,7 +19,8 @@ SUBSAMPLE_TABLE = pep.subsample_table
 rule all:
     input:
         expand("results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/",s=SAMPLES),
-        "results/quantification/vanilla_salmon_tes_transcripts/terminus.done"
+        "results/quantification/vanilla_salmon_tes_transcripts/terminus.done",
+        "results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.raw.csv",
         #expand("results/reads/fastp/{s}_r1.trimmed.fq.gz",s="DGRP_Line_100_Female_SAMN09738660")
         #expand("results/reads/dump/{s}/{e}/{r}/",s="DGRP_Line_100_Female_SAMN09738660",e=["SRX4483514"],r=['SRR7619150', 'SRR7619149'])
 
