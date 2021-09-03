@@ -20,6 +20,7 @@ rule salmon_decoy_mask_exons:
         time=10,
         mem=5000,
         cpus=1
+    priority: 50
     shell:
         """
         awk -v OFS='\\t' '{{if ($3=="exon") {{print $1,$4,$5}}}}' {input.gtf} > {output.exons} &&
@@ -48,6 +49,7 @@ rule salmon_decoy_mashmap_align_txome:
         time=20,
         mem=15000,
         cpus=8
+    priority: 50
     shell:
         """
         mashmap -r {input.masked} -q {input.txpfile} -t {threads} --pi 80 -s 500 -o {output.mm} 2> {log} &&
@@ -77,6 +79,7 @@ rule salmon_decoy_finalize:
         time=10,
         mem=5000,
         cpus=1
+    priority: 50
     shell:
         """
         gunzip -c {input.txpfile} > {output.txpfile} &&
@@ -91,6 +94,7 @@ rule salmon_decoy_get_ids:
         decoy = rules.salmon_decoy_finalize.output.decoy
     output:
         ids = "results/quantification/vanilla_salmon_tes_transcripts/decoy/decoy.txt"
+    priority: 50
     shell:
         """
         grep ">" {input.decoy} | awk '{{print substr($1,2); }}' > {output.ids}
@@ -118,6 +122,7 @@ rule salmon_index_transcripts_and_consensus_tes:
         time=60,
         mem=20000,
         cpus=8
+    priority: 50
     shell:
         """
         salmon index -t {input.fa} \
@@ -136,6 +141,7 @@ rule make_salmon_te_aux_target_file:
         tes = config.get("CONSENSUS_TE_FASTA"),
     output:
         "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt"
+    priority: 50
     shell:
         """
         zcat {input.tes} | grep ">" | tr -d ">" > {output}
@@ -171,6 +177,7 @@ rule salmon_quant_se_vanilla:
         "results/logs/salmon_quant_se_vanilla/{sample}.txt"
     singularity:
         "docker://quay.io/biocontainers/salmon:1.5.2--h84f40af_0"
+    priority: 51
     shell:
         """
         salmon quant --index {input.idx} \
