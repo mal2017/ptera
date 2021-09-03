@@ -199,12 +199,14 @@ rule vanilla_salmon_terminus_group:
         directory("results/quantification/vanilla_salmon_tes_transcripts/terminus/{sample}/"),
     singularity:
         "docker://quay.io/biocontainers/terminus:0.1.0--hd24f7c9_2"
+    log:
+        "results/logs/vanilla_salmon_terminus_group/{sample}.txt"
     resources:
         time=10,
         mem=5000,
         cpus=1
     shell:
-        "terminus group -d $(dirname {input}) -o $(dirname {output})"
+        "terminus group -d $(dirname {input}) -o $(dirname {output}) 2> {log}"
 
 rule vanilla_salmon_terminus_collapse:
     """
@@ -224,9 +226,11 @@ rule vanilla_salmon_terminus_collapse:
         time=10,
         mem=5000,
         cpus=1
+    log:
+        "results/logs/vanilla_salmon_terminus_collapse/log.txt"
     shell:
         """
-        terminus collapse -d {params.salm} -o {params.od}
+        terminus collapse -d {params.salm} -o {params.od} 2> {log}
         """
 
 rule vanilla_salmon_terminus_txp2group:
@@ -241,6 +245,10 @@ rule vanilla_salmon_terminus_txp2group:
         tx2group = temp("results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.raw.csv")
     params:
         cluster = "results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/clusters.txt".format(s=SAMPLES[0]),
+    resources:
+        time=10,
+        mem=5000,
+        cpus=1
     shell:
         """
         python workflow/scripts/extract_txp_group.py {input.sf} {params.cluster} {output.tx2group}
@@ -257,5 +265,47 @@ rule vanilla_salmon_terminus_txp2group_clean:
         tx2txsymbol = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2txsymbol,
     output:
         tx2group = "results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.tsv"
+    resources:
+        time=10,
+        mem=5000,
+        cpus=1
     script:
         "../scripts/clean_txp2group.R"
+
+rule vanilla_salmon_tximeta:
+    """
+    tximeta was used to summarize expression estimates and include metadata in summarizedExperiment objects.
+    """
+    input:
+        idx = rules.salmon_index_transcripts_and_consensus_tes.output,
+        fasta = rules.make_transcripts_and_consensus_tes_fasta.output.fa,
+        gtf = rules.make_transcripts_and_consensus_tes_gtf.output.gtf,
+        samples = "config/sample_table.csv",
+        salmon_files = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf", s=SAMPLES),
+        terminus = rules.vanilla_salmon_terminus_collapse.output,
+        raw = rules.vanilla_salmon_terminus_txp2group.output.tx2group,
+        tx2gene = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2symbol,
+        tx2feature = rules.vanilla_salmon_terminus_txp2group_clean.output.tx2group,
+        pipeline_meta = rules.get_pipeline_info.output
+    output:
+        json = "results/quantification/vanilla_salmon_tes_transcripts/tximeta.json",
+        salmon = "results/quantification/vanilla_salmon_tes_transcripts/salmon_se.rds",
+        salmon_tx ="results/quantification/vanilla_salmon_tes_transcripts/salmon_tx_se.rds",
+        terminus = "results/quantification/vanilla_salmon_tes_transcripts/terminus_se.rds",
+    singularity:
+        "docker://quay.io/biocontainers/bioconductor-tximeta:1.10.0--r41hdfd78af_0"
+    params:
+        flybase_release = config.get("FLYBASE_RELEASE"),
+        genome_version = config.get("GENOME_VERSION"),
+        terminus_files = expand("results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/quant.sf", s=SAMPLES),
+        counts_from_abundance_salmon = config.get("SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE"),
+        counts_from_abundance_salmon_txout = config.get("SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TXOUT"),
+        counts_from_abundance_terminus = config.get("SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS"),
+    resources:
+        time=60,
+        mem=20000,
+        cpus=1
+    log:
+        "results/logs/vanilla_salmon_tximeta/log.txt"
+    script:
+        "../scripts/vanilla_salmon_tximeta.R"

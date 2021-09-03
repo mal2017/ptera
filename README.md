@@ -6,7 +6,7 @@ Using mamba 0.9.2 (or conda 4.8.4) install the following:
 
 ```bash
 mamba create -n ptera_v1 \
-	python=3.9.6 snakemake=6.7.0 peppy=0.31.1 sra-tools=2.11.0 tabix=1.11
+	python=3.9.6 snakemake=6.7.0 peppy=0.31.1 sra-tools=2.11.0 tabix=1.11 r-base=4.0.3
 ```
 
 Other dependencies are handled at runtime.

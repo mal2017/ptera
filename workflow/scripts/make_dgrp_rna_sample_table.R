@@ -8,7 +8,7 @@ df2 <- df %>%
   distinct() %>%
   mutate(sample_name = paste(str_replace_all(source_name," ","_"),BioSample, sep="_"))
 
-df2 %>% dplyr::select(sample_name, source_name, Strain) %>%
+df2 %>% dplyr::select(sample_name, source_name, Strain, sex, age) %>%
   distinct() %>% write_csv("config/sample_table.csv")
 
 

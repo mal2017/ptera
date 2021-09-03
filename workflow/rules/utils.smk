@@ -21,7 +21,7 @@ flatten = lambda t: [item for sublist in t for item in sublist]
 # Utility Rules
 # ------------------------------------------------------------------------------
 
-localrules: make_transcripts_and_consensus_tes_fasta
+localrules: make_transcripts_and_consensus_tes_fasta, get_pipeline_info
 
 rule make_transcripts_and_consensus_tes_fasta:
     """
@@ -67,3 +67,12 @@ rule make_transcripts_and_consensus_tes_tx2gene:
         "docker://quay.io/biocontainers/bioconductor-rtracklayer:1.52.0--r41hd029910_0"
     script:
         "../scripts/make_transcripts_and_consensus_tes_tx2gene.R"
+
+rule get_pipeline_info:
+    output:
+        "results/meta/pipeline_meta.txt"
+    shell:
+        """
+        git rev-parse HEAD > {output} &&
+        git remote get-url origin >> {output}
+        """
