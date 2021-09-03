@@ -24,5 +24,12 @@ and processing the metadata file with a custom R script (see workflow/scripts).
 ## Running the pipeline
 
 ```bash
-snakemake --profile <your profile> --use-singularity -j 999 -kp --config RUN_TYPE=FULL -n
+snakemake --profile <your profile> --use-singularity -j 999 -kp \
+	--config RUN_TYPE=FULL -n
 ```
+
+If disk space is at a premium, consider running with `--prioritize salmon_quant_se_vanilla `
+to enforce creation of the quant output and deletion of temp files for each sample as fast as possible.
+
+Additionally, batching may be used by specifying `--batch salmon_quant_se_vanilla=1/N`
+and then repeating.

@@ -11,7 +11,7 @@ rule fasterq_dump:
         time=60,
         mem=config.get("FASTERQDUMP_MEM","8000"),
         cpus=1
-    priority: 30
+    priority: 1
     shell:
         """
         mkdir -p {output} &&
@@ -35,6 +35,6 @@ rule concat_runs:
         time=60,
         mem=20000,
         cpus=1
-    priority: 35
+    priority: 2
     shell:
         "cat {params.fqs} > {output}"

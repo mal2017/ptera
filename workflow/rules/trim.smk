@@ -17,7 +17,7 @@ rule fastp_trim_se:
         cpus=12
     singularity:
         "docker://quay.io/biocontainers/fastp:0.22.0--h2e03b76_0"
-    priority: 40
+    priority: 3
     shell:
         """
         fastp --in1 {input.r1} \
