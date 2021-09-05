@@ -310,7 +310,7 @@ rule vanilla_salmon_tximeta:
         counts_from_abundance_terminus = config.get("SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS"),
     resources:
         time=60,
-        mem=64000,
+        mem=128000,
         cpus=1
     log:
         "results/logs/vanilla_salmon_tximeta/log.txt"
