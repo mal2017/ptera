@@ -74,5 +74,5 @@ rule get_pipeline_info:
     shell:
         """
         git rev-parse HEAD > {output} &&
-        git remote get-url origin >> {output}
+        git config --get remote.origin.url >> {output}
         """
