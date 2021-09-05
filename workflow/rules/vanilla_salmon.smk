@@ -289,16 +289,16 @@ rule vanilla_salmon_tximeta:
         gtf = rules.make_transcripts_and_consensus_tes_gtf.output.gtf,
         samples = "config/sample_table.csv",
         salmon_files = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf", s=SAMPLES),
-        terminus = rules.vanilla_salmon_terminus_collapse.output,
+        #terminus = rules.vanilla_salmon_terminus_collapse.output,
         raw = rules.vanilla_salmon_terminus_txp2group.output.tx2group,
         tx2gene = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2symbol,
-        tx2feature = rules.vanilla_salmon_terminus_txp2group_clean.output.tx2group,
+        #tx2feature = rules.vanilla_salmon_terminus_txp2group_clean.output.tx2group,
         pipeline_meta = rules.get_pipeline_info.output
     output:
         json = "results/quantification/vanilla_salmon_tes_transcripts/tximeta.json",
         salmon = "results/quantification/vanilla_salmon_tes_transcripts/salmon_se.rds",
         salmon_tx ="results/quantification/vanilla_salmon_tes_transcripts/salmon_tx_se.rds",
-        terminus = "results/quantification/vanilla_salmon_tes_transcripts/terminus_se.rds",
+        #terminus = "results/quantification/vanilla_salmon_tes_transcripts/terminus_se.rds",
     singularity:
         "docker://quay.io/biocontainers/bioconductor-tximeta:1.10.0--r41hdfd78af_0"
     params:

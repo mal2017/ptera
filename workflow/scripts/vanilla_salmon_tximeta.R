@@ -54,22 +54,22 @@ samples <- read.csv(samples_fl,header = T)
 #files <- Sys.glob("results/quantification/vanilla_salmon_tes_transcripts/quant/*/quant.sf")
 #terminus_files <- Sys.glob("results/quantification/vanilla_salmon_tes_transcripts/terminus/*/quant.sf")
 files <- snakemake@input[["salmon_files"]]
-terminus_files <- snakemake@params[["terminus_files"]]
+#terminus_files <- snakemake@params[["terminus_files"]]
 names(files) <- gsub("\\/+quant.sf","",x=gsub(".+quant\\/+","",files))
-names(terminus_files) <- gsub("\\/+quant.sf","",x=gsub(".+terminus\\/+","",terminus_files))
+#names(terminus_files) <- gsub("\\/+quant.sf","",x=gsub(".+terminus\\/+","",terminus_files))
 
 # useful for testing a smaller subset, also good as foolproofing
 # in case some samples aren't quantified and this script is run manually
-samples <- samples[samples$sample_name %in% names(terminus_files),]
+samples <- samples[samples$sample_name %in% names(files),]
 
 # reorder to match sample table
 files <- files[samples$sample_name]
-terminus_files <- terminus_files[samples$sample_name]
+#terminus_files <- terminus_files[samples$sample_name]
 
 samples$names <- samples$sample_name
 samples$files <- files
-samples_terminus <- samples
-samples_terminus$files <- samples_terminus$files <- terminus_files
+#samples_terminus <- samples
+#samples_terminus$files <- samples_terminus$files <- terminus_files
 
 ## params for import
 #counts_from_abundance_salmon <- "lengthScaledTPM"
@@ -78,29 +78,29 @@ samples_terminus$files <- samples_terminus$files <- terminus_files
 
 counts_from_abundance_salmon <- snakemake@params[["counts_from_abundance_salmon"]]
 counts_from_abundance_salmon_txout <- snakemake@params[["counts_from_abundance_salmon_txout"]]
-counts_from_abundance_terminus <- snakemake@params[["counts_from_abundance_terminus"]]
+#counts_from_abundance_terminus <- snakemake@params[["counts_from_abundance_terminus"]]
 
 #tx2gene_fl <- "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2symbol.tsv"
 #tx2feature_fl <- "results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.tsv"
 tx2gene_fl <- snakemake@input[["tx2gene"]]
-tx2feature_fl <- snakemake@input[["tx2feature"]]
+#tx2feature_fl <- snakemake@input[["tx2feature"]]
 
 # get the conversion for transcripts
 tx2gene <- read.table(tx2gene_fl,header = T)
 
 # get the conversion for the renamed terminus grps w/ symbols in the name
-tx2feature <- read.table(tx2feature_fl,header = T)
-rownames(tx2feature) <- tx2feature$TXNAME
-tx2groupid_symbols <- tx2feature[,c("TXNAME","GROUPID_SYMBOLS")]
+#tx2feature <- read.table(tx2feature_fl,header = T)
+#rownames(tx2feature) <- tx2feature$TXNAME
+#tx2groupid_symbols <- tx2feature[,c("TXNAME","GROUPID_SYMBOLS")]
 
-salmon_tx_se <- tximeta(samples, 
-                     type="salmon", 
+salmon_tx_se <- tximeta(samples,
+                     type="salmon",
                      #customMetaInfo = file.path("..","..",basename(jsonFile)),
                      useHub = F,
                      skipMeta = F,
-                     tx2gene=tx2gene, 
+                     tx2gene=tx2gene,
                      txOut = T,
-                     cleanDuplicateTxps = T, 
+                     cleanDuplicateTxps = T,
                      markDuplicateTxps = T,
                      countsFromAbundance = counts_from_abundance_salmon_txout)
 
@@ -109,15 +109,15 @@ salmon_se <- summarizeToGene(salmon_tx_se,countsFromAbundance = counts_from_abun
 # terminus plays weird with tximeta because the feature names don't match with "genes"
 # in the gtf. So this is vanilla tximport but straight to a SummarizedExperiment with
 # not as much metadata as the regular salmon import.
-terminus_se <- tximeta(samples_terminus, 
-                        type="salmon", 
-                        #customMetaInfo = file.path("..","..",basename(jsonFile)),
-                        useHub = F,
-                        skipMeta = T,
-                        txOut = T,
-                        cleanDuplicateTxps = T, 
-                        markDuplicateTxps = T,
-                        countsFromAbundance = counts_from_abundance_terminus)
+#terminus_se <- tximeta(samples_terminus,
+#                        type="salmon",
+#                        #customMetaInfo = file.path("..","..",basename(jsonFile)),
+#                        useHub = F,
+#                        skipMeta = T,
+#                        txOut = T,
+#                        cleanDuplicateTxps = T,
+#                        markDuplicateTxps = T,
+#                        countsFromAbundance = counts_from_abundance_terminus)
 
 # --------------------------------------------------------------------------------------
 # extra metadata
@@ -129,14 +129,14 @@ pipeline_meta <-list(hash=pipeline_meta[1], url=pipeline_meta[2])
 
 salmon_tx_se@metadata$pipeline_info <- pipeline_meta
 salmon_se@metadata$pipeline_info <- pipeline_meta
-terminus_se@metadata$pipeline_info <- pipeline_meta
+#terminus_se@metadata$pipeline_info <- pipeline_meta
 
 # id conversion for terminus
-terminus_se@elementMetadata <- DataFrame(tx2feature[terminus_se@NAMES,])
+#terminus_se@elementMetadata <- DataFrame(tx2feature[terminus_se@NAMES,])
 
 # TODO: add DGRP line metadata here directly, ie wolbachia, etc
 
 # export
 saveRDS(salmon_tx_se, snakemake@output[["salmon_tx"]])
 saveRDS(salmon_se, snakemake@output[["salmon"]])
-saveRDS(terminus_se,snakemake@output[["terminus"]])
+#saveRDS(terminus_se,snakemake@output[["terminus"]])
