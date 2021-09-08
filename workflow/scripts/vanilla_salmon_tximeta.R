@@ -104,7 +104,7 @@ salmon_tx_se <- tximeta(samples,
                      markDuplicateTxps = T,
                      countsFromAbundance = counts_from_abundance_salmon_txout)
 
-salmon_se <- summarizeToGene(salmon_tx_se,countsFromAbundance = counts_from_abundance_salmon, dropInfReps=T)
+salmon_se <- summarizeToGene(salmon_tx_se,countsFromAbundance = counts_from_abundance_salmon)
 
 # terminus plays weird with tximeta because the feature names don't match with "genes"
 # in the gtf. So this is vanilla tximport but straight to a SummarizedExperiment with
