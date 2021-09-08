@@ -316,3 +316,38 @@ rule vanilla_salmon_tximeta:
         "results/logs/vanilla_salmon_tximeta/log.txt"
     script:
         "../scripts/vanilla_salmon_tximeta.R"
+
+rule vanilla_salmon_deseq2:
+    input:
+        se=rules.vanilla_salmon_tximeta.output.salmon
+    output:
+        dds="results/quantification/vanilla_salmon_tes_transcripts/salmon_dds.rds"
+    params:
+        formula = config.get("DESEQ2_LRT_FORMULA"),
+        reduced = config.get("DESEQ2_LRT_REDUCED_FORMULA")
+    resources:
+        time=240,
+        mem=64000,
+        cpus=24
+    threads:
+        24
+    singularity:
+        "docker://quay.io/biocontainers/bioconductor-deseq2:1.32.0--r41h399db7b_0"
+    log:
+        "results/logs/vanilla_salmon_deseq2/log.txt"
+    script:
+        "../scripts/vanilla_salmon_deseq2.R"
+
+rule vanilla_salmon_export_txt:
+    input:
+        dds=rules.vanilla_salmon_deseq2.output.dds
+    output:
+        txt="results/quantification/vanilla_salmon_tes_transcripts/salmon_{expression_unit}.tsv.gz"
+    resources:
+        time=20,
+        mem=20000,
+        cpus=1
+    singularity:
+        "docker://quay.io/biocontainers/bioconductor-deseq2:1.32.0--r41h399db7b_0"
+    script:
+        "../scripts/vanilla_salmon_export_txt.R"
