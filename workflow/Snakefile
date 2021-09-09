@@ -13,7 +13,7 @@ SUBSAMPLE_TABLE = pep.subsample_table
 rule all:
     input:
         "results/quantification/vanilla_salmon_tes_transcripts/salmon_se.rds",
-        expand("results/quantification/vanilla_salmon_tes_transcripts/salmon_{x}.tsv.gz",x=["raw","normcts","vst","rlog","fpkm","abundance","cpm"])
+        expand("results/quantification/vanilla_salmon_tes_transcripts/salmon_{x}.tsv.gz",x=["raw","normcts","fpkm","abundance","cpm"])
         #expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf",s=SAMPLES),
         #"results/quantification/vanilla_salmon_tes_transcripts/terminus.done",
         #"results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.raw.csv",

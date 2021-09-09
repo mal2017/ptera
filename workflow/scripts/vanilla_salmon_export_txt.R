@@ -13,7 +13,7 @@ if (ot == "raw") {
 } else if (ot == "normcts") {
   dat <- counts(dds,normalized=T)
 } else if (ot == "vst") {
-  dat <- assay(varianceStabilizingTransformation(dds,blind=F))
+  dat <- assay(vst(dds,blind=F))
 } else if (ot == "rlog") {
   dat <- assay(rlogTransformation(dds,blind=F))
 } else if (ot == "fpkm") {
