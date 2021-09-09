@@ -4,7 +4,7 @@ library(BiocParallel)
 #cores <- 4
 cores <- snakemake@threads
 
-register(MulticoreParam(cores))
+register(SnowParam(cores))
 
 #se_fl <- "results/quantification/vanilla_salmon_tes_transcripts/salmon_se.rds"
 se_fl <- snakemake@input[["se"]]
