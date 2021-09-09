@@ -342,7 +342,7 @@ rule vanilla_salmon_export_txt:
     input:
         dds=rules.vanilla_salmon_deseq2.output.dds
     output:
-        txt="results/quantification/vanilla_salmon_tes_transcripts/salmon_{expression_unit}.tsv.gz"
+        txt="results/quantification/vanilla_salmon_tes_transcripts/{expression_unit}.tsv.gz"
     resources:
         time=20,
         mem=20000,

@@ -12,8 +12,8 @@ SUBSAMPLE_TABLE = pep.subsample_table
 
 rule all:
     input:
-        "results/quantification/vanilla_salmon_tes_transcripts/salmon_se.rds",
-        expand("results/quantification/vanilla_salmon_tes_transcripts/salmon_{x}.tsv.gz",x=["raw","normcts","fpkm","abundance","cpm"])
+        expand("results/scatter/{a}/{b}/",a=["vanilla_salmon_tes_transcripts"], b=["raw","normcts","fpkm","vst","abundance","cpm","rlog"])
+        #expand("results/quantification/vanilla_salmon_tes_transcripts/{x}.tsv.gz",x=["raw","normcts","fpkm","abundance","cpm"])
         #expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf",s=SAMPLES),
         #"results/quantification/vanilla_salmon_tes_transcripts/terminus.done",
         #"results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.raw.csv",
@@ -24,3 +24,6 @@ include: "rules/download.smk"
 include: "rules/trim.smk"
 include: "rules/utils.smk"
 include: "rules/vanilla_salmon.smk"
+include: "rules/metadata.smk"
+include: "rules/scatter.smk"
+include: "rules/linear_modeling.smk"

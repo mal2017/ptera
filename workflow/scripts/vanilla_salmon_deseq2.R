@@ -12,12 +12,12 @@ se_fl <- snakemake@input[["se"]]
 se <- readRDS(se_fl)
 
 #form <- "~ Strain + sex"
-form <- snakemake@params[["formula"]]
+#form <- snakemake@params[["formula"]]
 
 #reduced <- "~ 1"
-reduced <- snakemake@params[["reduced"]]
+#reduced <- snakemake@params[["reduced"]]
 
-dds <- DESeqDataSet(se, as.formula(form))
+dds <- DESeqDataSet(se, ~ 1)
 
 #for (i in 1:100) {
 #  dds@assays@data[[paste0("infRep",i)]] <- NULL
