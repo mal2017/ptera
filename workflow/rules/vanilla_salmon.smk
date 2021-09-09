@@ -330,7 +330,7 @@ rule vanilla_salmon_deseq2:
         mem=64000,
         cpus=2
     threads:
-        2
+        1
     singularity:
         "docker://quay.io/biocontainers/bioconductor-deseq2:1.32.0--r41h399db7b_0"
     log:
