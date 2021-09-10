@@ -13,9 +13,9 @@ if (ot == "raw") {
 } else if (ot == "normcts") {
   dat <- counts(dds,normalized=T)
 } else if (ot == "vst") {
-  dat <- assay(vst(dds,blind=F))
+  dat <- assay(vst(dds,blind=T,fitType = snakemake@params[["DESEQ2_VST_FITTYPE"]]))
 } else if (ot == "rlog") {
-  dat <- assay(rlogTransformation(dds,blind=F))
+  dat <- assay(rlogTransformation(dds,blind=T,fitType = snakemake@params[["DESEQ2_RLOG_FITTYPE"]]))
 } else if (ot == "fpkm") {
   dat <- fpkm(dds)
 } else if (ot == "abundance") {

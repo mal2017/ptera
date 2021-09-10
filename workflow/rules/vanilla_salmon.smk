@@ -296,8 +296,8 @@ rule vanilla_salmon_tximeta:
         pipeline_meta = rules.get_pipeline_info.output
     output:
         json = "results/quantification/vanilla_salmon_tes_transcripts/tximeta.json",
-        salmon = "results/quantification/vanilla_salmon_tes_transcripts/salmon_se.rds",
-        salmon_tx ="results/quantification/vanilla_salmon_tes_transcripts/salmon_tx_se.rds",
+        salmon = "results/quantification/vanilla_salmon_tes_transcripts/se.rds",
+        salmon_tx ="results/quantification/vanilla_salmon_tes_transcripts/se.tx.rds",
         #terminus = "results/quantification/vanilla_salmon_tes_transcripts/terminus_se.rds",
     singularity:
         "docker://quay.io/biocontainers/bioconductor-tximeta:1.10.0--r41hdfd78af_0"
@@ -321,7 +321,7 @@ rule vanilla_salmon_deseq2:
     input:
         se=rules.vanilla_salmon_tximeta.output.salmon
     output:
-        dds="results/quantification/vanilla_salmon_tes_transcripts/salmon_dds.rds"
+        dds="results/quantification/vanilla_salmon_tes_transcripts/dds.rds"
     params:
         formula = config.get("DESEQ2_LRT_FORMULA"),
         reduced = config.get("DESEQ2_LRT_REDUCED_FORMULA")
@@ -347,6 +347,9 @@ rule vanilla_salmon_export_txt:
         time=240,
         mem=20000,
         cpus=1
+    params:
+        DESEQ2_VST_FITTYPE = config.get("DESEQ2_VST_FITTYPE"),
+        DESEQ2_RLOG_FITTYPE = config.get("DESEQ2_RLOG_FITTYPE"),
     singularity:
         "docker://quay.io/biocontainers/bioconductor-deseq2:1.32.0--r41h399db7b_0"
     script:

@@ -24,8 +24,8 @@ metadata_df <- vroom::vroom(metadata)  %>%
 
 con <- DBI::dbConnect(RSQLite::SQLite(), sqlite)
 
-copy_to(con, metadata_df, name = "sample_info")
+copy_to(con, metadata_df, name = "sample_info", temporary=F)
 
-copy_to(con, gene_df, name = "genes")
+copy_to(con, gene_df, name = "genes", temporary=F)
 
-copy_to(con, transposon_df, name = "transposons")
+copy_to(con, transposon_df, name = "transposons", temporary=F)
