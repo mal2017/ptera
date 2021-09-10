@@ -344,7 +344,7 @@ rule vanilla_salmon_export_txt:
     output:
         txt="results/quantification/vanilla_salmon_tes_transcripts/{expression_unit}.tsv.gz"
     resources:
-        time=20,
+        time=240,
         mem=20000,
         cpus=1
     singularity:
