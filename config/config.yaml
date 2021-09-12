@@ -29,5 +29,19 @@ SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS: scaledTPM # no, scaledTPM,
 # DESeq2 on salmon
 DESEQ2_LRT_FORMULA: ~ Strain + sex # not used right now
 DESEQ2_LRT_REDUCED_FORMULA: ~ 1 # not used right now
+DESEQ2_EXPORT_UNITS: ["vst","normcts","fpkm"] # ["vst","raw","normcts","fpkm","abundance","cpm"]
 DESEQ2_RLOG_FITTYPE: local
 DESEQ2_VST_FITTYPE: local
+
+# basic linear model options
+# Provid
+# Current other variables: wolbachia, sex, Strain (though this wouldn't make sense), age (all the same in these data)
+LM_MODELS_TO_FIT:
+  y_~_x_+_wolbachia_by_sex_salmon_vst: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
+    LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
+    LM_FIT_FOR_UNITS: vst
+    LM_FORMULA: y ~ x + wolbachia
+    LM_SPLIT_BY: ["sex"]
+    LM_GENE_FILTER: "sum(x <=0) != 800"
+    LM_TE_FILTER: "sum(y <=0) != 800"
+    LM_VARIABLE_TRANSFORM: NA # purr style lambda to transform any of the nonbinary variables
