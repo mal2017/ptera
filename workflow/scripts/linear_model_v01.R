@@ -45,7 +45,7 @@ sample_info <- tbl(con,"sample_info")
 transposons <- tbl(con,"transposons") %>% filter(transposon %in% expressed_tes)
 
 # last bit for testing only
-genes <- tbl(con,"genes") %>% filter(host_gene %in% expressed_genes) %>% filter(host_gene == "FBgn0085432") 
+genes <- tbl(con,"genes") %>% filter(host_gene %in% expressed_genes) #%>% filter(host_gene == "FBgn0085432") 
 
 res <- left_join(sample_info, genes) %>%
   left_join(transposons) %>%
