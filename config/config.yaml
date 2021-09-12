@@ -42,6 +42,6 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_UNITS: vst
     LM_FORMULA: y ~ x + wolbachia
     LM_SPLIT_BY: ["sex"]
-    LM_GENE_FILTER: "sum(x <=0) != 800"
+    LM_GENE_FILTER: "sum(x > 0) > 600 & sum(x > 7) > 100"
     LM_TE_FILTER: "sum(y <=0) != 800"
     LM_VARIABLE_TRANSFORM: NA # purr style lambda to transform any of the nonbinary variables

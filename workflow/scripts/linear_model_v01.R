@@ -12,12 +12,13 @@ split_by <- snakemake@params[["split_by"]]
 
 # transforms <- list(y = "~log2(.x+10)")
 transforms <- snakemake@params[["transforms"]]
+message(paste("transforms:",transforms))
 
-# filter_tes <- "sum(y <=0) != 800"
+# filter_tes <- "sum(y > 0) == 800"
 filter_tes <- snakemake@params[["te_filter"]]
 filter_tes <- paste0("filter(",filter_tes,")")
 
-# filter_genes<- "sum(x <=0) != 800"
+# filter_genes<- "sum(x > 0) > 600 & sum(x > 7) > 100"
 filter_genes <- snakemake@params[["gene_filter"]]
 filter_genes <- paste0("filter(",filter_genes,")")
 
