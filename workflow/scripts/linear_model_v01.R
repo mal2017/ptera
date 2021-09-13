@@ -4,13 +4,16 @@ library(rlang)
 
 # params
 
+#genes_to_use <- "results/linear_models/y_~_x_+_wolbachia_by_sex_salmon_vst/chunk_000" %>% read_tsv(col_names = "host_gene") %>% pull(host_gene)
+genes_to_use <- snakemake@input[["genes"]] %>% read_tsv(col_names = "host_gene") %>% pull(host_gene)
+
 # formula <- as.formula("y ~ x + wolbachia")
 formula <- as.formula(snakemake@params[["formula"]])
 
 # split_by <- c("sex")
 split_by <- snakemake@params[["split_by"]]
 
-# transforms <- list(y = "~log2(.x+10)")
+# transforms <- NA
 transforms <- snakemake@params[["transforms"]]
 message(paste("transforms:",transforms))
 
@@ -25,6 +28,14 @@ filter_genes <- paste0("filter(",filter_genes,")")
 # db_file <- "results/quantification/vanilla_salmon_tes_transcripts/vst.sqlite"
 db_file <- snakemake@input[["sqlite"]]
 
+message(paste("Data:",db_file))
+message(paste("TE filter expression:",filter_tes))
+message(paste("Gene filter expression:",filter_genes))
+message(paste("Fitting separate models for:",split_by))
+message(paste("Using formula:",format(formula)))
+message(paste("Using transformations:",transforms))
+message(paste("Applying to N genes:",length(genes_to_use)))
+
 # open db connection
 con <- DBI::dbConnect(RSQLite::SQLite(), db_file)
 
@@ -36,6 +47,7 @@ expressed_tes <- eval_tidy(expr(tbl(con,"transposons") %>%
   unique()
 
 expressed_genes <- eval_tidy(expr(tbl(con,"genes") %>% 
+                                    filter(host_gene %in% genes_to_use) %>%
                                     group_by(host_gene) %>% 
                                     !!parse_expr(filter_genes))) %>% 
   pull(host_gene) %>% 
@@ -48,6 +60,7 @@ transposons <- tbl(con,"transposons") %>% filter(transposon %in% expressed_tes)
 # last bit for testing only
 genes <- tbl(con,"genes") %>% filter(host_gene %in% expressed_genes) #%>% filter(host_gene == "FBgn0085432") 
 
+message("Pulling specified data into memory.")
 res <- left_join(sample_info, genes) %>%
   left_join(transposons) %>%
   collect()
@@ -55,18 +68,21 @@ res <- left_join(sample_info, genes) %>%
 # if transformations are in the params, loop through them and update the res.
 if(!is.na(transforms)) {
   for (i in names(transforms)) {
+    message(paste("Transforming variable '",i,".'"))
     res <- dplyr::mutate(res,across(.cols = all_of(i),.fns=eval(parse(text=transforms[[i]]))))
   }
 }
 
+message("Running lm.")
 res <- res %>% 
   nest(data=-all_of(c("host_gene","transposon",split_by))) %>%
   mutate(fit = map(data, ~lm(formula, data = .))) %>%
   dplyr::select(-data) %>%
   mutate(tidied = map(fit,broom::tidy),
-         glanced = map(fit,broom::glance),
-         augmented = map(fit, broom::augment))
+         glanced = map(fit,broom::glance))
+         #augmented = map(fit, broom::augment))
 
+message("Exporting results.")
 res %>%
   dplyr::select(sex, host_gene, transposon, glanced) %>%
   unnest(glanced) %>%
@@ -77,10 +93,10 @@ res %>%
   unnest(tidied) %>%
   vroom::vroom_write(snakemake@output[["tidied"]])
 
-res %>%
-  dplyr::select(sex, host_gene, transposon,augmented) %>%
-  unnest(augmented) %>%
-  vroom::vroom_write(snakemake@output[["augmented"]])
+#res %>%
+#  dplyr::select(sex, host_gene, transposon,augmented) %>%
+#  unnest(augmented) %>%
+#  vroom::vroom_write(snakemake@output[["augmented"]])
 
 saveRDS(res %>% dplyr::select(sex,host_gene,transposon,fit) ,snakemake@output[["fits"]])
 

@@ -7,13 +7,14 @@ Using mamba 0.9.2 (or conda 4.8.4) install the following:
 ```bash
 mamba create -n ptera_v1 \
 	python=3.9.6 snakemake=6.7.0 peppy=0.31.1 sra-tools=2.11.0 tabix=1.11 \
-	r-tidyverse=1.3.1 r-tidymodels=0.1.3 r-sparklyr=1.7.1 r-sqldf=0.4_11
+	r-tidyverse=1.3.1 r-tidymodels=0.1.3 r-sparklyr=1.7.1 r-sqldf=0.4_11 \
+	xsv=0.13.0
 ```
 
 Singularity must also be installed and accessible in this environment. Depending on
 your system this can be done via conda. For HPCs admin privileges may be required.
 
-Other dependencies are handled at runtime by singularity
+Other dependencies are handled at runtime by singularity.
 
 ## Where the data comes from
 

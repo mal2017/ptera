@@ -36,12 +36,13 @@ DESEQ2_VST_FITTYPE: local
 # basic linear model options
 # Provid
 # Current other variables: wolbachia, sex, Strain (though this wouldn't make sense), age (all the same in these data)
+LM_CHUNKS: 160 # number of chunks split genes into to process model fitting. can be up to 1000
 LM_MODELS_TO_FIT:
   y_~_x_+_wolbachia_by_sex_salmon_vst: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
     LM_FIT_FOR_UNITS: vst
     LM_FORMULA: y ~ x + wolbachia
     LM_SPLIT_BY: ["sex"]
-    LM_GENE_FILTER: "sum(x > 0) > 600 & sum(x > 7) > 100"
-    LM_TE_FILTER: "sum(y <=0) != 800"
+    LM_GENE_FILTER: "sum(x > 0) > 20" # already chunked, so this should be a light filter so as to make sure each chunk returns something
+    LM_TE_FILTER: "sum(y >0) > 1"
     LM_VARIABLE_TRANSFORM: NA # purr style lambda to transform any of the nonbinary variables
