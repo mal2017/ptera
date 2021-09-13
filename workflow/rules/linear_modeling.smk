@@ -29,7 +29,7 @@ rule chunked_linear_model:
         tidied = temp("results/linear_models/{model_id}/chunk_{lmchunk}.tidy.tsv"),
         glanced = temp("results/linear_models/{model_id}/chunk_{lmchunk}.glance.tsv"),
         #augmented = temp("results/linear_models/{model_id}/chunk_{lmchunk}.augment.tsv"),
-        fits = "results/linear_models/{model_id}/fits/chunk_{lmchunk}.fits.rds"
+        fits = temp("results/linear_models/{model_id}/fits/chunk_{lmchunk}.fits.rds")
     params:
         formula = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FORMULA"),
         split_by= lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_SPLIT_BY"),
