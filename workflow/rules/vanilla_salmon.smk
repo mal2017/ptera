@@ -195,89 +195,89 @@ rule salmon_quant_se_vanilla:
             -o $(dirname {output.sf})/ 2> {log}
         """
 
-rule vanilla_salmon_terminus_group:
-    """
-    To collapse transcripts to quantifiable clusters for which expression could be accurately estimated,
-    we applied terminus v0.1.0 group with default parameters.
-    """
-    input:
-        rules.salmon_quant_se_vanilla.output.sf
-    output:
-        directory("results/quantification/vanilla_salmon_tes_transcripts/terminus/{sample}/"),
-    singularity:
-        "docker://quay.io/biocontainers/terminus:0.1.0--hd24f7c9_2"
-    log:
-        "results/logs/vanilla_salmon_terminus_group/{sample}.txt"
-    resources:
-        time=10,
-        mem=5000,
-        cpus=1
-    shell:
-        "terminus group -d $(dirname {input}) -o $(dirname {output}) 2> {log}"
+# rule vanilla_salmon_terminus_group:
+#     """
+#     To collapse transcripts to quantifiable clusters for which expression could be accurately estimated,
+#     we applied terminus v0.1.0 group with default parameters.
+#     """
+#     input:
+#         rules.salmon_quant_se_vanilla.output.sf
+#     output:
+#         directory("results/quantification/vanilla_salmon_tes_transcripts/terminus/{sample}/"),
+#     singularity:
+#         "docker://quay.io/biocontainers/terminus:0.1.0--hd24f7c9_2"
+#     log:
+#         "results/logs/vanilla_salmon_terminus_group/{sample}.txt"
+#     resources:
+#         time=10,
+#         mem=5000,
+#         cpus=1
+#     shell:
+#         "terminus group -d $(dirname {input}) -o $(dirname {output}) 2> {log}"
 
-rule vanilla_salmon_terminus_collapse:
-    """
-    We used terminus collapse to recalculate expression estimates for all samples.
-    """
-    input:
-        salm = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf", s=SAMPLES),
-        term = expand("results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/", s=SAMPLES)
-    output:
-        touch("results/quantification/vanilla_salmon_tes_transcripts/terminus.done")
-    params:
-        od = "results/quantification/vanilla_salmon_tes_transcripts/terminus",
-        salm = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}", s=SAMPLES),
-    singularity:
-        "docker://quay.io/biocontainers/terminus:0.1.0--hd24f7c9_2"
-    resources:
-        time=10,
-        mem=5000,
-        cpus=1
-    log:
-        "results/logs/vanilla_salmon_terminus_collapse/log.txt"
-    shell:
-        """
-        terminus collapse -d {params.salm} -o {params.od} 2> {log}
-        """
+# rule vanilla_salmon_terminus_collapse:
+#     """
+#     We used terminus collapse to recalculate expression estimates for all samples.
+#     """
+#     input:
+#         salm = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf", s=SAMPLES),
+#         term = expand("results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/", s=SAMPLES)
+#     output:
+#         touch("results/quantification/vanilla_salmon_tes_transcripts/terminus.done")
+#     params:
+#         od = "results/quantification/vanilla_salmon_tes_transcripts/terminus",
+#         salm = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}", s=SAMPLES),
+#     singularity:
+#         "docker://quay.io/biocontainers/terminus:0.1.0--hd24f7c9_2"
+#     resources:
+#         time=10,
+#         mem=5000,
+#         cpus=1
+#     log:
+#         "results/logs/vanilla_salmon_terminus_collapse/log.txt"
+#     shell:
+#         """
+#         terminus collapse -d {params.salm} -o {params.od} 2> {log}
+#        """
 
-rule vanilla_salmon_terminus_txp2group:
-    """
-    Sample 1 is used as a template for the tx2group files.
-    """
-    input:
-        coll = rules.vanilla_salmon_terminus_collapse.output,
-        grp = "results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/".format(s=SAMPLES[0]),
-        sf = "results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf".format(s=SAMPLES[0]),
-    output:
-        tx2group = temp("results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.raw.csv")
-    params:
-        cluster = "results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/clusters.txt".format(s=SAMPLES[0]),
-    resources:
-        time=10,
-        mem=5000,
-        cpus=1
-    shell:
-        """
-        python workflow/scripts/extract_txp_group.py {input.sf} {params.cluster} {output.tx2group}
-        """
+# rule vanilla_salmon_terminus_txp2group:
+#     """
+#     Sample 1 is used as a template for the tx2group files.
+#     """
+#     input:
+#         coll = rules.vanilla_salmon_terminus_collapse.output,
+#         grp = "results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/".format(s=SAMPLES[0]),
+#         sf = "results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf".format(s=SAMPLES[0]),
+#     output:
+#         tx2group = temp("results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.raw.csv")
+#     params:
+#         cluster = "results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/clusters.txt".format(s=SAMPLES[0]),
+#     resources:
+#         time=10,
+#         mem=5000,
+#         cpus=1
+#     shell:
+#         """
+#         python workflow/scripts/extract_txp_group.py {input.sf} {params.cluster} {output.tx2group}
+#         """
 
-rule vanilla_salmon_terminus_txp2group_clean:
-    """
-    Sample 1 is used as a template for the tx2group files.
-    """
-    input:
-        raw = rules.vanilla_salmon_terminus_txp2group.output.tx2group,
-        tx2id = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2id,
-        tx2symbol = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2symbol,
-        tx2txsymbol = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2txsymbol,
-    output:
-        tx2group = "results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.tsv"
-    resources:
-        time=10,
-        mem=5000,
-        cpus=1
-    script:
-        "../scripts/clean_txp2group.R"
+# rule vanilla_salmon_terminus_txp2group_clean:
+#     """
+#     Sample 1 is used as a template for the tx2group files.
+#     """
+#     input:
+#         raw = rules.vanilla_salmon_terminus_txp2group.output.tx2group,
+#         tx2id = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2id,
+#         tx2symbol = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2symbol,
+#         tx2txsymbol = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2txsymbol,
+#     output:
+#         tx2group = "results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.tsv"
+#     resources:
+#         time=10,
+#         mem=5000,
+#         cpus=1
+#     script:
+#         "../scripts/clean_txp2group.R"
 
 rule vanilla_salmon_tximeta:
     """
@@ -296,8 +296,8 @@ rule vanilla_salmon_tximeta:
         pipeline_meta = rules.get_pipeline_info.output
     output:
         json = "results/quantification/vanilla_salmon_tes_transcripts/tximeta.json",
-        salmon = "results/quantification/vanilla_salmon_tes_transcripts/se.rds",
-        salmon_tx ="results/quantification/vanilla_salmon_tes_transcripts/se.tx.rds",
+        salmon = "results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds",
+        salmon_tx ="results/quantification/vanilla_salmon_tes_transcripts/se.transcript.rds",
         #terminus = "results/quantification/vanilla_salmon_tes_transcripts/terminus_se.rds",
     singularity:
         "docker://quay.io/biocontainers/bioconductor-tximeta:1.10.0--r41hdfd78af_0"
@@ -317,40 +317,25 @@ rule vanilla_salmon_tximeta:
     script:
         "../scripts/vanilla_salmon_tximeta.R"
 
-rule vanilla_salmon_deseq2:
-    input:
-        se=rules.vanilla_salmon_tximeta.output.salmon
-    output:
-        dds="results/quantification/vanilla_salmon_tes_transcripts/dds.rds"
-    params:
-        formula = config.get("DESEQ2_LRT_FORMULA"),
-        reduced = config.get("DESEQ2_LRT_REDUCED_FORMULA")
-    resources:
-        time=240,
-        mem=64000,
-        cpus=2
-    threads:
-        1
-    singularity:
-        "docker://quay.io/biocontainers/bioconductor-deseq2:1.32.0--r41h399db7b_0"
-    log:
-        "results/logs/vanilla_salmon_deseq2/log.txt"
-    script:
-        "../scripts/vanilla_salmon_deseq2.R"
 
-rule vanilla_salmon_export_txt:
-    input:
-        dds=rules.vanilla_salmon_deseq2.output.dds
-    output:
-        txt="results/quantification/vanilla_salmon_tes_transcripts/{expression_unit}.tsv.gz"
-    resources:
-        time=240,
-        mem=20000,
-        cpus=1
-    params:
-        DESEQ2_VST_FITTYPE = config.get("DESEQ2_VST_FITTYPE"),
-        DESEQ2_RLOG_FITTYPE = config.get("DESEQ2_RLOG_FITTYPE"),
-    singularity:
-        "docker://quay.io/biocontainers/bioconductor-deseq2:1.32.0--r41h399db7b_0"
-    script:
-        "../scripts/vanilla_salmon_export_txt.R"
+# rule vanilla_salmon_deseq2:
+#     input:
+#         se=rules.vanilla_salmon_tximeta.output.salmon
+#     output:
+#         dds="results/quantification/vanilla_salmon_tes_transcripts/dds.rds"
+#     params:
+#         formula = config.get("DESEQ2_LRT_FORMULA"),
+#         reduced = config.get("DESEQ2_LRT_REDUCED_FORMULA")
+#     resources:
+#         time=240,
+#         mem=64000,
+#         cpus=2
+#     threads:
+#         1
+#     singularity:
+#         "docker://quay.io/biocontainers/bioconductor-deseq2:1.32.0--r41h399db7b_0"
+#     log:
+#         "results/logs/vanilla_salmon_deseq2/log.txt"
+#     script:
+#         "../scripts/vanilla_salmon_deseq2.R"
+#

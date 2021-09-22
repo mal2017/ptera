@@ -1,7 +1,8 @@
 library(tidyverse)
 
 #expression <- "results/quantification/vanilla_salmon_tes_transcripts/cpm.tsv.gz"
-expression <- snakemake@input[["expression"]]
+male_expression <- snakemake@input[["male_expression"]]
+female_expression <- snakemake@input[["female_expression"]]
 
 #sqlite <- "results/quantification/vanilla_salmon_tes_transcripts/cpm.sqlite"
 sqlite <- snakemake@output[["sqlite"]]
@@ -9,7 +10,7 @@ sqlite <- snakemake@output[["sqlite"]]
 #metadata <- "results/meta/metadata.csv"
 metadata <- snakemake@input[["meta"]]
 
-df <- vroom::vroom(expression)
+df <- full_join(vroom::vroom(male_expression), vroom::vroom(female_expression), by="feature")
 
 gene_df <- df %>% filter(grepl("FBgn",feature)) %>%
   pivot_longer(cols = -"feature", names_to = "sample", values_to = "x") %>%

@@ -5,7 +5,7 @@ rule scatter_genes_for_lm:
     Note: Escape brackets on wcs when using in conjunction w/ scattergather.
     """
     input:
-        lambda wc: "results/quantification/{p}/{u}.tsv.gz".format(p=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_PIPELINE"), u=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_UNITS"))
+        lambda wc: "results/quantification/{p}/both.{fl}.{u}.tsv.gz".format(p=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_PIPELINE"),fl=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_FEATURE_LEVEL"), u=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_UNITS"))
     output:
         temp(expand("results/linear_models/{{model_id}}/chunk_{ch}",ch=[str(x).zfill(3) for x in range(0,config.get("LM_CHUNKS",80))]))
     params:
@@ -24,7 +24,7 @@ rule chunked_linear_model:
     """
     input:
         genes = "results/linear_models/{model_id}/chunk_{lmchunk}",
-        sqlite = lambda wc: expand("results/quantification/{p}/{u}.sqlite",p=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_PIPELINE"), u=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_UNITS"))
+        sqlite = lambda wc: expand("results/quantification/{p}/{fl}.{u}.sqlite",p=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_PIPELINE"),fl=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_FEATURE_LEVEL"), u=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_UNITS"))
     output:
         tidied = temp("results/linear_models/{model_id}/chunk_{lmchunk}.tidy.tsv"),
         glanced = temp("results/linear_models/{model_id}/chunk_{lmchunk}.glance.tsv"),

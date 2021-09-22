@@ -13,6 +13,7 @@ SUBSAMPLE_TABLE = pep.subsample_table
 rule all:
     input:
         expand("results/linear_models/{lms}/lm.{r}.tsv.gz",lms=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),
+        #expand("results/quantification/vanilla_salmon_tes_transcripts/gene.{x}.sqlite",x=config.get("EXPORT_UNITS")),
         #expand("results/quantification/vanilla_salmon_tes_transcripts/{x}.sqlite",x=config.get("DESEQ2_EXPORT_UNITS")),
         #expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf",s=SAMPLES),
         #"results/quantification/vanilla_salmon_tes_transcripts/terminus.done",

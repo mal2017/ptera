@@ -22,43 +22,50 @@ SALMON_VANILLA_POSBIAS: TRUE
 SALMON_VANILLA_USE_AUXTARGETS: FALSE
 SALMON_VANILLA_USE_DECOYS: TRUE
 SALMON_VANILLA_SOFTCLIP: TRUE
+
+# Tximport
+# these values will be "counts" for all downstream approaches. This is
+# relevant as the input to DESeq2 but also because some normalizations are run
+# on these directly. So, that means those normalizations are run on totally raw
+# counts if the params below == "no"
 SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE: scaledTPM # no, scaledTPM, lengthScaledTPM
 SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TXOUT: dtuScaledTPM # no, scaledTPM, lengthScaledTPM, dtuScaledTPM
 SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS: scaledTPM # no, scaledTPM, lengthScaledTPM
+EXPORT_UNITS: ["vst","normcts","fpkm","edaseq_uq","ppc_qn","edaseq_qn"] # ["vst","counts","normcts","fpkm","abundance","cpm","uq","qn"]
 
 # DESeq2 on salmon
 DESEQ2_LRT_FORMULA: ~ Strain + sex # not used right now
 DESEQ2_LRT_REDUCED_FORMULA: ~ 1 # not used right now
-DESEQ2_EXPORT_UNITS: ["vst","normcts","fpkm"] # ["vst","raw","normcts","fpkm","abundance","cpm"]
-DESEQ2_RLOG_FITTYPE: local
-DESEQ2_VST_FITTYPE: local
+DESEQ2_FITTYPE: local
 
 # basic linear model options
-# Provid
 # Current other variables: wolbachia, sex, Strain (though this wouldn't make sense), age (all the same in these data)
 LM_CHUNKS: 160 # number of chunks split genes into to process model fitting. can be up to 1000
 LM_MODELS_TO_FIT:
-  y_~_x_+_wolbachia_by_sex_salmon_vst: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
+  y_~_x_+_wolbachia_by_sex_salmon_edaseq_qn: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
-    LM_FIT_FOR_UNITS: vst
+    LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
+    LM_FIT_FOR_UNITS: edaseq_qn
     LM_FORMULA: y ~ x + wolbachia
     LM_SPLIT_BY: ["sex"]
     LM_GENE_FILTER: "sum(x > 0) > 20" # already chunked, so this should be a light filter so as to make sure each chunk returns something
     LM_TE_FILTER: "sum(y >0) > 1"
-    LM_VARIABLE_TRANSFORM: NA # purr style lambda to transform any of the nonbinary variables
-  y_~_x_+_wolbachia_+_sex_salmon_vst: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
+    LM_VARIABLE_TRANSFORM: ~{log2(.x+1} # purr style lambda to transform any of the nonbinary variables
+  y_~_x_+_wolbachia_by_sex_salmon_edaseq_uq: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
-    LM_FIT_FOR_UNITS: vst
-    LM_FORMULA: y ~ x + wolbachia + sex
-    LM_SPLIT_BY: NA
+    LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
+    LM_FIT_FOR_UNITS: edaseq_uq
+    LM_FORMULA: y ~ x + wolbachia
+    LM_SPLIT_BY: ["sex"]
     LM_GENE_FILTER: "sum(x > 0) > 20" # already chunked, so this should be a light filter so as to make sure each chunk returns something
     LM_TE_FILTER: "sum(y >0) > 1"
-    LM_VARIABLE_TRANSFORM: NA # purr style lambda to transform any of the nonbinary variables
-  y_~_x_salmon_vst: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
+    LM_VARIABLE_TRANSFORM: ~{log2(.x+1} # purr style lambda to transform any of the nonbinary variables
+  y_~_x_+_wolbachia_by_sex_salmon_vst: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
+    LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
     LM_FIT_FOR_UNITS: vst
-    LM_FORMULA: y ~ x
-    LM_SPLIT_BY: NA
+    LM_FORMULA: y ~ x + wolbachia
+    LM_SPLIT_BY: ["sex"]
     LM_GENE_FILTER: "sum(x > 0) > 20" # already chunked, so this should be a light filter so as to make sure each chunk returns something
     LM_TE_FILTER: "sum(y >0) > 1"
     LM_VARIABLE_TRANSFORM: NA # purr style lambda to transform any of the nonbinary variables

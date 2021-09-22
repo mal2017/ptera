@@ -76,3 +76,21 @@ rule get_pipeline_info:
         git rev-parse HEAD > {output} &&
         git config --get remote.origin.url >> {output}
         """
+
+rule se_export_txt:
+    """
+    Generic rule for exporting raw or normalized expression from a serialized
+    SummarizedExperiment object.
+    """
+    input:
+        se="results/quantification/{quant_pipeline}/se.{feature_level}.rds"
+    output:
+        txt="results/quantification/{quant_pipeline}/{sex}.{feature_level}.{expression_unit}.tsv.gz"
+    resources:
+        time=240,
+        mem=20000,
+        cpus=1
+    params:
+        DESEQ2_FITTYPE = config.get("DESEQ2_FITTYPE"),
+    script:
+        "../scripts/se_export_txt.R"

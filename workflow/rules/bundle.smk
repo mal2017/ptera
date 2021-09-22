@@ -7,14 +7,15 @@ rule bundle_expression:
     gene1\t100\t200 ...
     ...
 
-    Additionally, genes only must be in FBgn ids.
-
+    Additionally, genes must be in FBgn ids. TEs or other features can be anything.
+    This allows for easy creation of separate tables in the resulting sqlite db.
     """
     input:
-        expression = "results/quantification/{quant_pipeline}/{expression_unit}.tsv.gz",
+        male_expression = "results/quantification/{quant_pipeline}/male.{feature_level}.{expression_unit}.tsv.gz",
+        female_expression = "results/quantification/{quant_pipeline}/female.{feature_level}.{expression_unit}.tsv.gz",
         meta = rules.collect_metadata.output
     output:
-        sqlite = "results/quantification/{quant_pipeline}/{expression_unit}.sqlite"
+        sqlite = "results/quantification/{quant_pipeline}/{feature_level}.{expression_unit}.sqlite"
     resources:
         time=20,
         mem=20000,
