@@ -48,8 +48,8 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_UNITS: edaseq_qn
     LM_FORMULA: y ~ x + wolbachia
     LM_SPLIT_BY: ["sex"]
-    LM_GENE_FILTER: "sum(x > 0) > 1" # already chunked, so this should be a light filter so as to make sure each chunk returns something
-    LM_TE_FILTER: "sum(y >0) > 1"
+    LM_GENE_FILTER: "sum(x > 0) > 3" # already chunked, so this should be a light filter so as to make sure each chunk returns something
+    LM_TE_FILTER: "sum(y >0) > 3"
     LM_VARIABLE_TRANSFORM: ~{log2(.x+1)} # purr style lambda to transform any of the nonbinary variables
   y_~_x_+_wolbachia_by_sex_salmon_edaseq_uq: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
@@ -57,8 +57,8 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_UNITS: edaseq_uq
     LM_FORMULA: y ~ x + wolbachia
     LM_SPLIT_BY: ["sex"]
-    LM_GENE_FILTER: "sum(x > 0) > 1" # already chunked, so this should be a light filter so as to make sure each chunk returns something
-    LM_TE_FILTER: "sum(y >0) > 1"
+    LM_GENE_FILTER: "sum(x > 0) > 3" # already chunked, so this should be a light filter so as to make sure each chunk returns something
+    LM_TE_FILTER: "sum(y >0) > 3"
     LM_VARIABLE_TRANSFORM: ~{log2(.x+1)} # purr style lambda to transform any of the nonbinary variables
   y_~_x_+_wolbachia_by_sex_salmon_vst: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
@@ -66,6 +66,6 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_UNITS: vst
     LM_FORMULA: y ~ x + wolbachia
     LM_SPLIT_BY: ["sex"]
-    LM_GENE_FILTER: "sum(x > 0) > 1" # already chunked, so this should be a light filter so as to make sure each chunk returns something
-    LM_TE_FILTER: "sum(y >0) > 1"
+    LM_GENE_FILTER: "sum(x > 0) > 3" # already chunked, so this should be a light filter so as to make sure each chunk returns something
+    LM_TE_FILTER: "sum(y >0) > 3"
     LM_VARIABLE_TRANSFORM: NA # purr style lambda to transform any of the nonbinary variables
