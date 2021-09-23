@@ -4,7 +4,7 @@ library(rlang)
 
 # params
 
-#genes_to_use <- "results/linear_models/y_~_x_+_wolbachia_by_sex_salmon_vst/chunk_000" %>% read_tsv(col_names = "host_gene") %>% pull(host_gene)
+#genes_to_use <- "results/linear_models/y_~_x_+_wolbachia_by_sex_salmon_edaseq_qn/chunk_000" %>% read_tsv(col_names = "host_gene") %>% pull(host_gene)
 genes_to_use <- snakemake@input[["genes"]] %>% read_tsv(col_names = "host_gene") %>% pull(host_gene)
 
 # formula <- as.formula("y ~ x + wolbachia")
@@ -13,7 +13,7 @@ formula <- as.formula(snakemake@params[["formula"]])
 # split_by <- c("sex")
 split_by <- snakemake@params[["split_by"]]
 
-# transforms <- NA
+# transforms <- ~{log2(.x+1)}
 transforms <- snakemake@params[["transforms"]]
 message(paste("transforms:",transforms))
 
@@ -25,7 +25,7 @@ filter_tes <- paste0("filter(",filter_tes,")")
 filter_genes <- snakemake@params[["gene_filter"]]
 filter_genes <- paste0("filter(",filter_genes,")")
 
-# db_file <- "results/quantification/vanilla_salmon_tes_transcripts/vst.sqlite"
+#db_file <- "results/quantification/vanilla_salmon_tes_transcripts/gene.edaseq_qn.sqlite"
 db_file <- snakemake@input[["sqlite"]]
 
 message(paste("Data:",db_file))
@@ -84,6 +84,9 @@ if (!is.na(split_by) & split_by!="NA") {
   split_by <-  c("host_gene","transposon")
 }
 message(paste("Nesting by:",split_by))
+
+# diagnostic
+save.image(file = "~/lm.RData")
 
 res <- res %>%
   nest(data=-all_of(split_by)) %>%
