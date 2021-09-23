@@ -53,7 +53,8 @@ expressed_tes <- eval_tidy(expr(tbl(con,"transposons") %>%
 expressed_genes <- eval_tidy(expr(tbl(con,"genes") %>%
                                     filter(host_gene %in% genes_to_use) %>%
                                     group_by(host_gene) %>%
-                                    !!parse_expr(filter_genes))) %>%
+                                    !!parse_expr(filter_genes)
+                             )) %>%
   pull(host_gene) %>%
   unique()
 
@@ -86,7 +87,7 @@ if (!is.na(split_by) & split_by!="NA") {
 message(paste("Nesting by:",split_by))
 
 # diagnostic
-save.image(file = "~/lm.RData")
+#save.image(file = "~/lm.RData")
 
 res <- res %>%
   nest(data=-all_of(split_by)) %>%
