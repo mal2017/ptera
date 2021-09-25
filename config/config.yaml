@@ -61,30 +61,30 @@ LM_MODELS_TO_FIT:
     LM_VARIABLE_TRANSFORM: x # for no transform just put 'x', or for countlike data something like log2(x+1)
     LM_VARIABLE_SCALE: true # scale genes to have mean 0 and sd 1
     LM_CORRECT_N_PCS: 4 # number of pcs to correct for with WGCNA
-  female_vst: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
-    LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
-    LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
-    LM_FIT_FOR_UNITS: vst # on of EXPORT_UNITS above
-    LM_FORMULA: y ~ x + wolbachia
-    LM_SEX: female # male, female, or both
-    LM_VARIABLE_TRANSFORM: x # for no transform just put 'x', or for countlike data something like log2(x+1)
-    LM_VARIABLE_SCALE: true # scale genes to have mean 0 and sd 1
-    LM_CORRECT_N_PCS: 4 # number of pcs to correct for with WGCNA
-  male_edaseq_qn: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
-    LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
-    LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
-    LM_FIT_FOR_UNITS: vst # on of EXPORT_UNITS above
-    LM_FORMULA: y ~ x + wolbachia
-    LM_SEX: male # male, female, or both
-    LM_VARIABLE_TRANSFORM: log2(x+1) # for no transform just put 'x', or for countlike data something like log2(x+1)
-    LM_VARIABLE_SCALE: true # scale genes to have mean 0 and sd 1
-    LM_CORRECT_N_PCS: 4 # number of pcs to correct for with WGCNA
-  female_edaseq_qn: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
-    LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
-    LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
-    LM_FIT_FOR_UNITS: vst # on of EXPORT_UNITS above
-    LM_FORMULA: y ~ x + wolbachia
-    LM_SEX: female # male, female, or both
-    LM_VARIABLE_TRANSFORM: log2(x+1) # for no transform just put 'x', or for countlike data something like log2(x+1)
-    LM_VARIABLE_SCALE: true # scale genes to have mean 0 and sd 1
-    LM_CORRECT_N_PCS: 4 # number of pcs to correct for with WGCNA
+  # female_vst: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
+  #   LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
+  #   LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
+  #   LM_FIT_FOR_UNITS: vst # on of EXPORT_UNITS above
+  #   LM_FORMULA: y ~ x + wolbachia
+  #   LM_SEX: female # male, female, or both
+  #   LM_VARIABLE_TRANSFORM: x # for no transform just put 'x', or for countlike data something like log2(x+1)
+  #   LM_VARIABLE_SCALE: true # scale genes to have mean 0 and sd 1
+  #   LM_CORRECT_N_PCS: 4 # number of pcs to correct for with WGCNA
+  # male_edaseq_qn: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
+  #   LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
+  #   LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
+  #   LM_FIT_FOR_UNITS: vst # on of EXPORT_UNITS above
+  #   LM_FORMULA: y ~ x + wolbachia
+  #   LM_SEX: male # male, female, or both
+  #   LM_VARIABLE_TRANSFORM: log2(x+1) # for no transform just put 'x', or for countlike data something like log2(x+1)
+  #   LM_VARIABLE_SCALE: true # scale genes to have mean 0 and sd 1
+  #   LM_CORRECT_N_PCS: 4 # number of pcs to correct for with WGCNA
+  # female_edaseq_qn: # the name for the lm fitting run. Will be a directory in the linear_modeling output dir
+  #   LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
+  #   LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
+  #   LM_FIT_FOR_UNITS: vst # on of EXPORT_UNITS above
+  #   LM_FORMULA: y ~ x + wolbachia
+  #   LM_SEX: female # male, female, or both
+  #   LM_VARIABLE_TRANSFORM: log2(x+1) # for no transform just put 'x', or for countlike data something like log2(x+1)
+  #   LM_VARIABLE_SCALE: true # scale genes to have mean 0 and sd 1
+  #   LM_CORRECT_N_PCS: 4 # number of pcs to correct for with WGCNA
