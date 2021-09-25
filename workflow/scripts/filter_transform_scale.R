@@ -9,13 +9,13 @@ se <- read_rds(sefile)
 x <- assay(se,"counts")
 
 # set up filter
-#filt <- parse_expr( "((!str_detect(rownames(x),'FBgn')) & rowSums(x > 1) > 10) | (rowSums(x > 10) > 100)" )
+#filt <- parse_expr( "(((!str_detect(rownames(x),'FBgn')) & rowSums(x > 1) > 10) | (rowSums(x > 10) > 100)) & rowSums(x == 0) < 0.3*ncol(x)" )
 filt <- parse_expr( snakemake@params[["filt"]] )
 features_2_use <-  rownames(x[eval(filt),])
 
-rm(x); rm(se)
+rm(x); #rm(se)
 
-#matfile <- "results/quantification/vanilla_salmon_tes_transcripts/male.gene.edaseq_qn.tsv.gz"
+#matfile <- "results/quantification/vanilla_salmon_tes_transcripts/male.gene.vst.tsv.gz"
 matfile <- snakemake@input[["mat"]]
 x <- vroom::vroom(matfile,num_threads = 1)
 
@@ -31,6 +31,7 @@ transforms <- parse_expr(transforms)
 x <- eval(transforms)
 
 # ------------------------- scaling ----------------------------------
+
 # scale <- T
 scale <- snakemake@params[["scale"]]
 message(class(x))
