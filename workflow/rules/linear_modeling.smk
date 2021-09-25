@@ -1,5 +1,3 @@
-localrules: collect_chunked_linear_models, scatter_genes_for_lm
-
 rule filter_transform_scale:
     input:
         sefile = lambda wc: "results/quantification/{p}/se.{fl}.rds".format(p=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_PIPELINE"),fl=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_FEATURE_LEVEL")),
