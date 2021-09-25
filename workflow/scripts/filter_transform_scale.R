@@ -9,7 +9,7 @@ se <- read_rds(sefile)
 x <- assay(se,"counts")
 
 # set up filter
-#filt <- parse_expr( "((!str_detect(rownames(x),'FBgn')) & rowSums(x > 0) > 400) | (rowSums(x > 10) > 400)" )
+#filt <- parse_expr( "((!str_detect(rownames(x),'FBgn')) & rowSums(x > 1) > 10) | (rowSums(x > 10) > 100)" )
 filt <- parse_expr( snakemake@params[["filt"]] )
 features_2_use <-  rownames(x[eval(filt),])
 
@@ -40,6 +40,7 @@ if (scale) {
 }
 
 # ------------------------- pcs -------------------------------------
+#pcs <- 4
 pcs <- snakemake@params[["pcs"]]
 
 if (pcs > 0) {
