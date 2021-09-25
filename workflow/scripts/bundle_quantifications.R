@@ -1,10 +1,11 @@
 library(tidyverse)
 
-#expression <- "results/quantification/vanilla_salmon_tes_transcripts/cpm.tsv.gz"
+#male_expression <- "results/quantification/vanilla_salmon_tes_transcripts/male.gene.edaseq_qn.tsv.gz"
+#female_expression <- "results/quantification/vanilla_salmon_tes_transcripts/female.gene.edaseq_qn.tsv.gz"
 male_expression <- snakemake@input[["male_expression"]]
 female_expression <- snakemake@input[["female_expression"]]
 
-#sqlite <- "results/quantification/vanilla_salmon_tes_transcripts/cpm.sqlite"
+#sqlite <- "~/work/test.sqlite"
 sqlite <- snakemake@output[["sqlite"]]
 
 #metadata <- "results/meta/metadata.csv"
