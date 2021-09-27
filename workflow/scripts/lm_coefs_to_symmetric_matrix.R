@@ -18,7 +18,7 @@ x <- res.tidy$feature.x
 y <- res.tidy$feature.y
 z <- res.tidy$estimate
 
-for (i in 1:nrow(res_vst.tidy)) {
+for (i in 1:nrow(res.tidy)) {
   mat[x[i], y[i]] <- z[i]
   mat[y[i], x[i]] <- z[i]
 }
