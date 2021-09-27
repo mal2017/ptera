@@ -85,3 +85,15 @@ rule collect_chunked_linear_models:
         cpus=1
     shell:
         "xsv cat rows -d '\t' {input} | tr ',' '\t' | gzip -c > {output}"
+
+rule lm_coefs_to_symmetric_matrix:
+    input:
+        tidy = "results/linear_models/{model_id}/lm.tidy.tsv.gz"
+    output:
+        tsv="results/linear_models/{model_id}/coefs.mat.tsv.gz"
+    resources:
+        time=480,
+        mem=48000,
+        cpus=1
+    script:
+        "../scripts/lm_coefs_to_symmetric_matrix.R"
