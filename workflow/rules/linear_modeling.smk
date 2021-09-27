@@ -26,6 +26,10 @@ rule scatter_genes_for_lm:
     params:
         chunks = config.get("LM_CHUNKS"),
         prefix = lambda wc: "results/linear_models/{model_id}/chunk_".format(model_id=wc.model_id)
+    resources:
+        time=240,
+        mem=48000,
+        cpus=1
     shell:
         """
         awk '
@@ -75,5 +79,9 @@ rule collect_chunked_linear_models:
         lambda wc: expand("results/linear_models/{{model_id}}/chunk_{ch}.{lmr}.tsv",ch = [str(x).zfill(4) for x in range(0,config.get("LM_CHUNKS",80))],lmr=wc.lmresult)
     output:
         "results/linear_models/{model_id}/lm.{lmresult}.tsv.gz"
+    resources:
+        time=60,
+        mem=24000,
+        cpus=1
     shell:
         "xsv cat rows -d '\t' {input} | tr ',' '\t' | gzip -c > {output}"
