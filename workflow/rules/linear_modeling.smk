@@ -1,4 +1,9 @@
 rule filter_transform_scale:
+    """
+    This rule takes parameters from a given linear model run section in config.yaml
+    and filters, transforms, and scales accordingly. Optionally, it will correct the centered and scaled matrix
+    by regressing out a specified number of prinicipal components.
+    """
     input:
         sefile = lambda wc: "results/quantification/{p}/se.{fl}.rds".format(p=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_PIPELINE"),fl=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_FEATURE_LEVEL")),
         mat =lambda wc: "results/quantification/{p}/{s}.{fl}.{u}.tsv.gz".format(p=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_PIPELINE"),s=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_SEX"),fl=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_FEATURE_LEVEL"), u=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_UNITS"))
@@ -87,6 +92,10 @@ rule collect_chunked_linear_models:
         "xsv cat rows -d '\t' {input} | tr ',' '\t' | gzip -c > {output}"
 
 rule lm_coefs_to_symmetric_matrix:
+    """
+    A symmetric matrix was reconstructed from the pairwise LMs generated from the 'lower
+    triangle' of features.
+    """
     input:
         tidy = "results/linear_models/{model_id}/lm.tidy.tsv.gz"
     output:
