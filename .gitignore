@@ -3,3 +3,4 @@ results/
 *~
 resources/
 .Rproj.user
+.cache

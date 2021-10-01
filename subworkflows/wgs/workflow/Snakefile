@@ -1,0 +1,27 @@
+import sys
+import peppy
+import glob
+
+configfile: "../../config/config.yaml"
+pepfile: config.get("PEP")
+
+SAMPLES = [x.sample_name for x in pep.samples]
+SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:2]
+
+SUBSAMPLE_TABLE = pep.subsample_table
+
+subworkflow main_wf:
+    workdir:
+        "../../../"
+    snakefile:
+        "../../../workflow/Snakefile"
+
+rule all:
+    input:
+        "results/copies/copies.tsv"
+
+include: "../../../workflow/rules/utils.smk"
+include: "../../../workflow/rules/download.smk"
+include: "../../../workflow/rules/trim.smk"
+include: "rules/align.smk"
+include: "rules/copies.smk"

@@ -28,6 +28,14 @@ and processing the metadata file with a custom R script (see workflow/scripts).
 This pipeline requires a `resources` folder which should be downloaded and placed in the
 pipeline directory (level with `config/` for example).
 
+## Test Mode
+
+Note that by default `RUN_TYPE=TEST`. This is useful for testing individual pipeline
+components (i.e. subworkflows or the initial portions of the main workflow), but due to
+the difficulty of making sure equivalent strain samples are always processed in the
+test dataset for each subworkflow, test mode is not guaranteed to complete the full workflow
+(main wf + subworkflows).
+
 ## Running the pipeline
 
 ```bash
