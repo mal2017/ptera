@@ -21,6 +21,7 @@ rule wgs_mosdepth:
         excl = config.get("MOSDEPTH_SAM_FLAG_EXCLUDE")
     singularity:
         "docker://quay.io/biocontainers/mosdepth:0.3.2--h01d7912_0"
+    priority: 3
     shell:
         """
         mosdepth -n -t {threads} --by {params.ws} -f {input.ref} \
@@ -37,6 +38,7 @@ rule wgs_estimate_te_copies:
         time=30,
         mem=20000,
         cpus=2
+    priority: 3
     script:
         "../scripts/copies.R"
 

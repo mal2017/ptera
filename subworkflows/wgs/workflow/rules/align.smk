@@ -58,6 +58,7 @@ rule wgs_bwa_mem2_align:
         time=240,
         mem=64000,
         cpus=24
+    priority: 2
     singularity:
         "docker://quay.io/biocontainers/bwa-mem2:2.2.1--h9a82719_1"
     shell:
@@ -77,6 +78,7 @@ rule wgs_samtools_fixmate:
         time=20,
         mem=20000,
         cpus=8
+    priority: 2
     singularity:
         "docker://quay.io/biocontainers/samtools:1.13--h8c37831_0"
     shell:
@@ -100,6 +102,7 @@ rule wgs_samtools_sort:
         cpus=12
     threads:
         12
+    priority: 2
     shell:
         """
         samtools sort -@ {threads} -m 1G {input} -o {output.cram} &&
@@ -121,6 +124,7 @@ rule wgs_samtools_markdup:
         cpus=12
     threads:
         12
+    priority: 2
     shell:
         """
         samtools markdup -@ {threads} --reference {input.ref} -O CRAM \

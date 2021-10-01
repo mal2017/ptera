@@ -20,7 +20,7 @@ rule all:
     input:
         expand("results/linear_models/{m}/coefs.mat.tsv.gz",m=config.get("LM_MODELS_TO_FIT")),
         expand("results/linear_models/{m}/lm.{r}.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),
-        wgs_wf("results/copies/copies.tsv")
+        #wgs_wf("results/copies/copies.tsv")
         #expand("results/linear_models/male_edaseq_qn/chunk_{ch}",ch=[str(x).zfill(4) for x in range(0,config.get("LM_CHUNKS",80))])
         #expand("results/linear_models/{lms}/lm.{r}.tsv.gz",lms=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),
         #expand("results/quantification/vanilla_salmon_tes_transcripts/gene.{x}.sqlite",x=config.get("EXPORT_UNITS")),
