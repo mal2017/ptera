@@ -19,6 +19,7 @@ COMBINED_TE_GENOME_FA: resources/plus-repeats.fasta.gz
 COMBINED_TE_FEATURE_GTF: resources/plus-repeats.gtf
 
 # --------------------------- job options --------------------------------------
+FASTERQDUMP_MEM: 24000
 
 # mosdepth for te copy estimation
 MOSDEPTH_WINDOW_SIZE: 100

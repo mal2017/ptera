@@ -8,7 +8,7 @@ rule fasterq_dump:
     threads:
         22
     resources:
-        time=60,
+        time=240,
         mem=config.get("FASTERQDUMP_MEM","8000"),
         cpus=1
     priority: 1
@@ -32,8 +32,8 @@ rule concat_runs:
     threads:
         1
     resources:
-        time=60,
-        mem=20000,
+        time=120,
+        mem=24000,
         cpus=1
     priority: 2
     shell:

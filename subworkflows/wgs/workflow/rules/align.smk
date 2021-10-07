@@ -55,8 +55,8 @@ rule wgs_bwa_mem2_align:
     params:
         idx = "results/mapping/index/idx"
     resources:
-        time=240,
-        mem=64000,
+        time=480,
+        mem=128000,
         cpus=24
     priority: 2
     singularity:
