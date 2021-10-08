@@ -134,6 +134,9 @@ salmon_se@metadata$pipeline_info <- pipeline_meta
 # id conversion for terminus
 #terminus_se@elementMetadata <- DataFrame(tx2feature[terminus_se@NAMES,])
 
+# ------------------------------------------
+# other per-sample annotation info
+# ------------------------------------------
 # TODO: add DGRP line metadata here directly, ie wolbachia, etc
 
 # export

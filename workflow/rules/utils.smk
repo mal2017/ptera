@@ -77,20 +77,44 @@ rule get_pipeline_info:
         git config --get remote.origin.url >> {output}
         """
 
+rule dummy_copies:
+    """
+    Rule generates a strain x feature matrix populated with 1s. This allows
+    this pipeline to run when WGS is available and when WGS is not available.
+    As with situations when WGS is available, samples are joined by their strain,
+    so this must be accurately included in the sample_table.csv in the config
+    directory.
+
+    Format required is below, but only strain and est.copies need to be populated.
+    Strain, sample_name, sequence, length, bases, median.cov, est.copies
+
+    Note that this includes features at the tx and gene level. Similarly, it includes
+    TE scaffold names and TE feature names, all set to have est.copies = 1.
+    """
+    input:
+        samples = "config/sample_table.csv",
+        feats = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2id,
+    output:
+        feats = temp("results/dummy-copies.tsv"),
+    script:
+        "../scripts/dummy-copies.R"
+
 rule se_export_txt:
     """
     Generic rule for exporting raw or normalized expression from a serialized
     SummarizedExperiment object.
     """
     input:
-        se="results/quantification/{quant_pipeline}/se.{feature_level}.rds"
+        se="results/quantification/{quant_pipeline}/se.{feature_level}.rds",
+        copies = wgs_wf("results/copies/copies.tsv") if config.get("INCL_COPY_ESTIMATION_IN_EXPORT") else rules.dummy_copies.output.feats
     output:
-        txt="results/quantification/{quant_pipeline}/{sex}.{feature_level}.{expression_unit}.tsv.gz"
+        txt="results/quantification/{quant_pipeline}/{sex}.{feature_level}.{cnnorm}.{expression_unit}.tsv.gz"
     resources:
         time=240,
         mem=20000,
         cpus=1
     params:
         DESEQ2_FITTYPE = config.get("DESEQ2_FITTYPE"),
+        adjustment = lambda wc: True if wc.cnnorm == "per_est_copy" else "per_feature"
     script:
         "../scripts/se_export_txt.R"

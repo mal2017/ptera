@@ -279,6 +279,8 @@ rule salmon_quant_se_vanilla:
 #     script:
 #         "../scripts/clean_txp2group.R"
 
+
+
 rule vanilla_salmon_tximeta:
     """
     tximeta was used to summarize expression estimates and include metadata in summarizedExperiment objects.
@@ -287,13 +289,13 @@ rule vanilla_salmon_tximeta:
         idx = rules.salmon_index_transcripts_and_consensus_tes.output,
         fasta = rules.make_transcripts_and_consensus_tes_fasta.output.fa,
         gtf = rules.make_transcripts_and_consensus_tes_gtf.output.gtf,
-        samples = "config/sample_table.csv",
+        samples = "config/sample_table.csv", # TODO make this the output of the anno rule
         salmon_files = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf", s=SAMPLES),
         #terminus = rules.vanilla_salmon_terminus_collapse.output,
         #raw = rules.vanilla_salmon_terminus_txp2group.output.tx2group,
-        tx2gene = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2symbol,
+        tx2gene = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2symbol, # TODO - automatically groups by gene id with TXImeta, but maybe worth making sure
         #tx2feature = rules.vanilla_salmon_terminus_txp2group_clean.output.tx2group,
-        pipeline_meta = rules.get_pipeline_info.output
+        pipeline_meta = rules.get_pipeline_info.output,
     output:
         json = "results/quantification/vanilla_salmon_tes_transcripts/tximeta.json",
         salmon = "results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds",
@@ -316,6 +318,16 @@ rule vanilla_salmon_tximeta:
         "results/logs/vanilla_salmon_tximeta/log.txt"
     script:
         "../scripts/vanilla_salmon_tximeta.R"
+
+
+# rule vanilla_salmon_te_expression_per_copy:
+#     input:
+#         rds = "results/quantification/vanilla_salmon_tes_transcripts/se.{feature_level}.rds",
+#         copies = wgs_wf("results/copies/copies.tsv")
+#     output:
+#         "results/quantification/vanilla_salmon_tes_transcripts/se.{feature_level}.te_ct_per_copy.rds"
+#     script:
+#         "../scripts/vanilla_salmon_te_ct_per_copy.R"
 
 
 # rule vanilla_salmon_deseq2:
