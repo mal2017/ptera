@@ -52,11 +52,11 @@ rule get_per_strain_insertions:
 
 def aggregate_known_insertions_within_group(wildcards):
     checkpoint_output = checkpoints.extract_polymorphic_insertions.get(**wildcards).output.dir
-    print(checkpoint_output)
+    #print(checkpoint_output)
     wc_path = os.path.join(checkpoint_output, "{d}_result/")
-    print(wc_path)
+    #print(wc_path)
     x = glob_wildcards(wc_path)
-    print(x)
+    #print(x)
     return expand("results/overlaps/polymorphic_insertions/{tidal_group}/{i}.tsv",
            tidal_group=wildcards.tidal_group,
            i=x.d)
