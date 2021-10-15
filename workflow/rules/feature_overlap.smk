@@ -93,5 +93,9 @@ rule feature_overlaps:
         ins = rules.collect_all_tidal_insertions.output
     output:
         tsv="results/overlaps/overlaps.tsv.gz"
+    resources:
+        time=20,
+        mem=12000,
+        cpus=1
     script:
         "../scripts/per_strain_te_gene_overlaps.R"
