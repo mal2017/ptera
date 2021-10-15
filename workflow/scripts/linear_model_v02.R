@@ -51,8 +51,8 @@ res <- df %>%
   mutate(fit=map(data,~lm(formula, data = .))) %>%
   #dplyr::select(-data) %>%
   mutate(tidy = map(fit,broom::tidy),
-         glance = map(fit,broom::glance),
-         aug = map2(fit, data, broom::augment_columns))
+         glance = map(fit,broom::glance))
+         #aug = map2(fit, data, broom::augment_columns))
 
 rm(df); rm(dat)
 
@@ -62,8 +62,8 @@ rm(df); rm(dat)
 
 tidy_fl <- snakemake@output[["tidy"]]
 glance_fl <- snakemake@output[["glance"]]
-fits_fl <- snakemake@output[["fits"]]
-aug_fl <- snakemake@output[["aug"]]
+#fits_fl <- snakemake@output[["fits"]]
+#aug_fl <- snakemake@output[["aug"]]
 
 res %>% dplyr::select(feature.x, feature.y, tidy) %>%
   unnest(tidy) %>%
@@ -74,17 +74,17 @@ res %>% dplyr::select(feature.x, feature.y, glance) %>%
   unnest(glance) %>%
   vroom::vroom_write(glance_fl)
 
-fits <- res %>% dplyr::select(feature.x, feature.y, fit) %>%
+#fits <- res %>% dplyr::select(feature.x, feature.y, fit) %>%
   #unite(relationship,feature.y, feature.x, sep="~") %>%
   #deframe() %>%
-  saveRDS(fits_fl)
+#  saveRDS(fits_fl)
   
 # https://people.duke.edu/~rnau/testing.htm
 # aug results will be usefull as well
-aug <- res %>% dplyr::select(feature.y,feature.x,aug) %>%
-  unnest(aug)
+#aug <- res %>% dplyr::select(feature.y,feature.x,aug) %>%
+#  unnest(aug)
 
-vroom::vroom_write(aug, aug_fl)
+#vroom::vroom_write(aug, aug_fl)
 
 #aug %>% 
 #  ggplot(aes(sample=.resid)) +
