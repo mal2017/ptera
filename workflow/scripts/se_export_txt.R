@@ -17,7 +17,7 @@ stopifnot(ot %in% c("counts","normcts","vst","fpkm","abundance","ppc_qn","edaseq
 
 # ------------ estimate copy number norm ----------------------------------
 # do_copy_norm <- T
-do_copy_norm <- snakemake@params[["adjustment"]]
+do_copy_norm <- snakemake@params[["copy_adjustment"]]
 # copies_fl <- "subworkflows/wgs/results/copies/copies.tsv"
 copies_fl <- snakemake@input[["copies"]]
 

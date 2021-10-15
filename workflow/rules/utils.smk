@@ -115,6 +115,6 @@ rule se_export_txt:
         cpus=1
     params:
         DESEQ2_FITTYPE = config.get("DESEQ2_FITTYPE"),
-        adjustment = lambda wc: True if wc.cnnorm == "per_est_copy" else "per_feature"
+        copy_adjustment = lambda wc: True if wc.cnnorm == "per_est_copy" else False
     script:
         "../scripts/se_export_txt.R"
