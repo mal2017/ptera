@@ -62,7 +62,8 @@ rule chunked_linear_model:
     input:
         chunk = "results/linear_models/{model_id}/chunk_{lmchunk}",
         dat = rules.filter_transform_scale.output.mat,
-        cd = rules.collect_metadata.output
+        cd = rules.collect_metadata.output,
+        ol = rules.feature_overlaps.output.tsv
     output:
         tidy = temp("results/linear_models/{model_id}/chunk_{lmchunk}.tidy.tsv"),
         glance = temp("results/linear_models/{model_id}/chunk_{lmchunk}.glance.tsv"),
