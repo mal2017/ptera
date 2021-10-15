@@ -5,3 +5,5 @@ resources/
 .Rproj.user
 .cache
 fasterq*/
+RM_*/
+.RepeatMaskerCache

@@ -19,7 +19,7 @@ subworkflow wgs_wf:
 rule all:
     input:
         expand("results/linear_models/{m}/coefs.mat.tsv.gz",m=config.get("LM_MODELS_TO_FIT")),
-        #expand("results/linear_models/{m}/lm.{r}.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),
+        expand("results/linear_models/{m}/lm.{r}.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance","aug"]),
         #wgs_wf("results/copies/copies.tsv")
         #expand("results/linear_models/male_edaseq_qn/chunk_{ch}",ch=[str(x).zfill(4) for x in range(0,config.get("LM_CHUNKS",80))])
         #expand("results/linear_models/{lms}/lm.{r}.tsv.gz",lms=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),
@@ -38,3 +38,5 @@ include: "rules/vanilla_salmon.smk"
 include: "rules/metadata.smk"
 include: "rules/bundle.smk"
 include: "rules/linear_modeling.smk"
+include: "rules/repeatmasker.smk"
+include: "rules/feature_overlap.smk"

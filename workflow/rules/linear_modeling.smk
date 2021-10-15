@@ -66,6 +66,7 @@ rule chunked_linear_model:
     output:
         tidy = temp("results/linear_models/{model_id}/chunk_{lmchunk}.tidy.tsv"),
         glance = temp("results/linear_models/{model_id}/chunk_{lmchunk}.glance.tsv"),
+        aug = temp("results/linear_models/{model_id}/chunk_{lmchunk}.aug.tsv"),
         fits = temp("results/linear_models/{model_id}/fits/chunk_{lmchunk}.fits.rds")
     params:
         formula = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FORMULA"),
