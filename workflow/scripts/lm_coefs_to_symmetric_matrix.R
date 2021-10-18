@@ -5,6 +5,8 @@ tidy_fl <- snakemake@input[["tidy"]]
 
 res.tidy <- vroom(tidy_fl, num_threads = 1)
 
+res.tidy <- filter(res.tidy, term == "x")
+
 features.x <- unique(res.tidy$feature.x)
 features.y <- unique(res.tidy$feature.y)
 

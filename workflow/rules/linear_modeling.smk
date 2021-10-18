@@ -72,7 +72,7 @@ rule chunked_linear_model:
     params:
         formula = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FORMULA"),
     resources:
-        time=60,
+        time=120,
         mem=128000,
         cpus=1
     script:
