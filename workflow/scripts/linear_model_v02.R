@@ -29,7 +29,7 @@ df <- left_join(df,cd, by=c(sample="sample_name"))
 
 # -------------- add the overlap annotation to the dataframe ---------------
 
-ol_fl <- "results/overlaps/overlaps.tsv.gz"
+#ol_fl <- "results/overlaps/overlaps.tsv.gz"
 ol_fl <- snakemake@input[["ol"]]
 
 ol <- read_tsv(ol_fl) %>%
@@ -38,12 +38,28 @@ ol <- read_tsv(ol_fl) %>%
 df <- df %>% left_join(ol, by = c("feature.y", "feature.x", "Strain")) %>%
   mutate(overlap = ifelse(is.na(overlap),F,overlap))
 
+# ----------- add the copies annotation to the dataframe
+
+#copies_fl <- "subworkflows/wgs/results/copies/copies.tsv"
+copies_fl <- snakemake@input[["copies"]]
+
+copies <- read_tsv(copies_fl) %>%
+  group_by(sequence) %>%
+  mutate(scaled.copies = scale(est.copies)[,1]) %>%
+  ungroup()
+
+# join estimated copies and set to 1 where no info is available
+df <- df %>% 
+  left_join(copies, by=c(Strain="Strain",feature.x="sequence")) %>%
+  left_join(copies, by=c(Strain="Strain",feature.y="sequence")) %>%
+  mutate_at(c("est.copies.y","est.copies.x", "scaled.copies.x","scaled.copies.y"),replace_na,1)
+
 # --------begin to evaluate the lms --------
 
 # rename these variables so the config can be more succinct
 df <- df %>% dplyr::rename(x="score.x", y="score.y")
 
-# formula <- as.formula("y ~ x + wolbachia + overlap")
+# formula <- as.formula("y ~ x + wolbachia + overlap + scaled.copies.x + scaled.copies.y")
 formula <- as.formula(snakemake@params[["formula"]])
 
 res <- df %>%
@@ -78,7 +94,7 @@ res %>% dplyr::select(feature.x, feature.y, glance) %>%
   #unite(relationship,feature.y, feature.x, sep="~") %>%
   #deframe() %>%
 #  saveRDS(fits_fl)
-  
+
 # https://people.duke.edu/~rnau/testing.htm
 # aug results will be usefull as well
 #aug <- res %>% dplyr::select(feature.y,feature.x,aug) %>%
@@ -86,13 +102,13 @@ res %>% dplyr::select(feature.x, feature.y, glance) %>%
 
 #vroom::vroom_write(aug, aug_fl)
 
-#aug %>% 
+#aug %>%
 #  ggplot(aes(sample=.resid)) +
 #  geom_qq() +
 #  geom_qq_line() +
 #  facet_wrap(feature.x ~ feature.y)
 #  geom_point(aes(group=feature.y)) +
-#  #geom_line(aes(group = feature.y), alpha = 1 / 3) + 
+#  #geom_line(aes(group = feature.y), alpha = 1 / 3) +
 #  geom_smooth(se = FALSE) +
 #  geom_rug() +
 #  facet_wrap(~feature.y)
