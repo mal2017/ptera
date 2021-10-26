@@ -49,10 +49,11 @@ copies <- read_tsv(copies_fl) %>%
   ungroup()
 
 # join estimated copies and set to 1 where no info is available
-df <- df %>% 
+df <- df %>%
   left_join(copies, by=c(Strain="Strain",feature.x="sequence")) %>%
   left_join(copies, by=c(Strain="Strain",feature.y="sequence")) %>%
-  mutate_at(c("est.copies.y","est.copies.x", "scaled.copies.x","scaled.copies.y"),replace_na,1)
+  mutate_at(c("est.copies.y","est.copies.x"), replace_na, 1) %>%
+  mutate_at(c("scaled.copies.x","scaled.copies.y"),replace_na,0)
 
 # --------begin to evaluate the lms --------
 
