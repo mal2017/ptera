@@ -78,7 +78,7 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
     LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
     LM_FIT_FOR_UNITS: vst # one of EXPORT_UNITS above
-    LM_CNNORM: per_est_feature # per_est_copy (applied to TEs only) or per_feature
+    LM_CNNORM: per_feature # per_est_copy (applied to TEs only) or per_feature
     LM_FORMULA: y ~ x + wolbachia + overlap + scaled.copies.x + scaled.copies.y
     LM_SEX: male # male, female, or both
     LM_VARIABLE_TRANSFORM: x # for no transform just put 'x', or for countlike data something like log2(x+1)
@@ -88,7 +88,7 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts # currently the only option
     LM_FIT_FOR_FEATURE_LEVEL: "gene" # gene or transcript
     LM_FIT_FOR_UNITS: vst # one of EXPORT_UNITS above
-    LM_CNNORM: per_est_feature # per_est_copy (applied to TEs only) or per_feature
+    LM_CNNORM: per_feature # per_est_copy (applied to TEs only) or per_feature
     LM_FORMULA: y ~ x + wolbachia + overlap + scaled.copies.x + scaled.copies.y
     LM_SEX: female # male, female, or both
     LM_VARIABLE_TRANSFORM: x # for no transform just put 'x', or for countlike data something like log2(x+1)
