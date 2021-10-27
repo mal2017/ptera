@@ -105,7 +105,7 @@ rule lm_coefs_to_symmetric_matrix:
         tsv="results/linear_models/{model_id}/coefs.mat.tsv.gz"
     resources:
         time=480,
-        mem=48000,
+        mem=128000,
         cpus=1
     script:
         "../scripts/lm_coefs_to_symmetric_matrix.R"
