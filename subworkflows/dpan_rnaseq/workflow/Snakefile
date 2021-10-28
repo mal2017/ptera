@@ -1,0 +1,33 @@
+import sys
+import peppy
+import glob
+
+configfile: "config/config.yaml"
+pepfile: config.get("PEP")
+
+SAMPLES = [x.sample_name for x in pep.samples]
+SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:2]
+print(SAMPLES)
+
+SUBSAMPLE_TABLE = pep.subsample_table
+
+subworkflow main_wf:
+    workdir:
+        "../../../"
+    snakefile:
+        "../../../workflow/Snakefile"
+
+rule all:
+    input:
+        "results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds"
+
+
+include: "../../../workflow/rules/download.smk"
+include: "../../../workflow/rules/trim.smk"
+include: "../../../workflow/rules/utils.smk"
+include: "../../../workflow/rules/vanilla_salmon.smk"
+include: "../../../workflow/rules/metadata.smk"
+include: "../../../workflow/rules/bundle.smk"
+include: "../../../workflow/rules/repeatmasker.smk"
+include: "../../../workflow/rules/feature_overlap.smk"
+include: "../../../workflow/rules/linear_modeling.smk"
