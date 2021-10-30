@@ -9,7 +9,7 @@ mamba create -n ptera_v1 \
 	python=3.9.6 snakemake=6.7.0 peppy=0.31.1 sra-tools=2.11.0 tabix=1.11 \
 	r-tidyverse=1.3.1 r-tidymodels=0.1.3 r-sparklyr=1.7.1 r-sqldf=0.4_11 \
 	xsv=0.13.0 bioconductor-deseq2=1.32.0 bioconductor-preprocesscore=1.54.0 \
-	bioconductor-edaseq=2.26.0 r-wgcna=1.69
+	bioconductor-edaseq=2.26.0 r-wgcna=1.69 samtools=1.14
 ```
 
 Singularity must also be installed and accessible in this environment. Depending on

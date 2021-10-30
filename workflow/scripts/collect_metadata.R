@@ -1,9 +1,9 @@
 library(tidyverse)
 library(readxl)
 
-sample_df <- read_csv("config/sample_table.csv")
+sample_df <- read_csv(snakemake@input[["sample_table"]])
 
-wolbachia <- read_xlsx("resources/wolbachia.xlsx") %>%
+wolbachia <- read_xlsx(snakemake@input[["wolbachia"]]) %>%
   dplyr::rename(line = `DGRP Line`, wolbachia = `Infection Status`) %>%
   mutate(Strain = paste0("DGRP_",str_extract(line, "(?<=__).+"))) %>%
   mutate(wolbachia = wolbachia == "y") %>%

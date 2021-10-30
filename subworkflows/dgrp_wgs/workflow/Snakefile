@@ -2,19 +2,19 @@ import sys
 import peppy
 import glob
 
-configfile: "../../config/config.yaml"
+configfile: "config/config.yaml"
 pepfile: config.get("PEP")
 
 SAMPLES = [x.sample_name for x in pep.samples]
-SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:2]
+SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:1]
 
 SUBSAMPLE_TABLE = pep.subsample_table
 
-subworkflow main_wf:
+subworkflow refs_wf:
     workdir:
-        "../../../"
+        "../../references/"
     snakefile:
-        "../../../workflow/Snakefile"
+        "../../references/workflow/Snakefile"
 
 rule all:
     input:
@@ -23,5 +23,5 @@ rule all:
 include: "../../../workflow/rules/utils.smk"
 include: "../../../workflow/rules/download.smk"
 include: "../../../workflow/rules/trim.smk"
-include: "rules/align.smk"
+include: "../../../workflow/rules/align.smk"
 include: "rules/copies.smk"

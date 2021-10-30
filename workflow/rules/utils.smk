@@ -15,58 +15,24 @@ def get_experiments(sample):
     """
     return list(set(pep.subsample_table[pep.subsample_table.sample_name == sample].Experiment))
 
+def is_paired_end(sample):
+    """
+    Returns the libary layout for a given sample. Assumes that all libraries for a given sample
+    use the same layout, otherwise returns a string.
+    """
+    layouts_represented = set(pep.subsample_table[pep.subsample_table.sample_name == sample].LibraryLayout)
+    if len(layouts_represented) > 1:
+        return "ERROR! make sure each sample has only paired end or single end libraries."
+    return all([x == "PAIRED" for x in layouts_represented])
+
 flatten = lambda t: [item for sublist in t for item in sublist]
 
 # ------------------------------------------------------------------------------
 # Utility Rules
 # ------------------------------------------------------------------------------
 
-localrules: make_transcripts_and_consensus_tes_fasta, get_pipeline_info
+localrules: get_pipeline_info
 
-rule make_transcripts_and_consensus_tes_fasta:
-    """
-    We generated the combined transcriptome reference by concatenating the set of transcript
-    sequences and the set of consensus TE sequences.
-    """
-    input:
-        tes = config.get("CONSENSUS_TE_FASTA"),
-        txs = config.get("FULL_TRANSCRIPT_FASTA")
-    output:
-        fa = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz",
-        dummy_decoy = touch("results/references/transcripts_and_consensus_tes/dummy_decoy.txt")
-    shell:
-        "cat {input.tes} {input.txs} > {output.fa}"
-
-rule make_transcripts_and_consensus_tes_gtf:
-    """
-    We generated the combined transcriptome reference by concatenating the set of transcript
-    sequences and the set of consensus TE sequences.
-    """
-    input:
-        te_fasta = config.get("CONSENSUS_TE_FASTA"),
-        host_gtf = config.get("TRANSCRIPTOME_GTF")
-    output:
-        gtf = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf",
-    singularity:
-        "docker://quay.io/biocontainers/bioconductor-rtracklayer:1.52.0--r41hd029910_0"
-    script:
-        "../scripts/make_transcripts_and_consensus_tes_gtf.R"
-
-rule make_transcripts_and_consensus_tes_tx2gene:
-    """
-    We generated the combined transcriptome reference by concatenating the set of transcript
-    sequences and the set of consensus TE sequences.
-    """
-    input:
-        gtf = rules.make_transcripts_and_consensus_tes_gtf.output.gtf
-    output:
-        tx2id = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2id.tsv",
-        tx2symbol = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2symbol.tsv",
-        tx2txsymbol = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2txsymbol.tsv",
-    singularity:
-        "docker://quay.io/biocontainers/bioconductor-rtracklayer:1.52.0--r41hd029910_0"
-    script:
-        "../scripts/make_transcripts_and_consensus_tes_tx2gene.R"
 
 rule get_pipeline_info:
     output:
@@ -93,7 +59,7 @@ rule dummy_copies:
     """
     input:
         samples = "config/sample_table.csv",
-        feats = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2id,
+        feats = refs_wf("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2id.tsv")
     output:
         feats = temp("results/dummy-copies.tsv"),
     script:
@@ -106,7 +72,6 @@ rule se_export_txt:
     """
     input:
         se="results/quantification/{quant_pipeline}/se.{feature_level}.rds",
-        copies = wgs_wf("results/copies/copies.tsv") if config.get("INCL_COPY_ESTIMATION_IN_EXPORT") else rules.dummy_copies.output.feats
     output:
         txt="results/quantification/{quant_pipeline}/{sex}.{feature_level}.{cnnorm}.{expression_unit}.tsv.gz"
     resources:
@@ -115,6 +80,5 @@ rule se_export_txt:
         cpus=1
     params:
         DESEQ2_FITTYPE = config.get("DESEQ2_FITTYPE"),
-        copy_adjustment = lambda wc: True if wc.cnnorm == "per_est_copy" else False
     script:
         "../scripts/se_export_txt.R"

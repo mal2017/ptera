@@ -6,9 +6,9 @@ rule fastp_trim_se:
     input:
         r1=rules.concat_runs.output
     output:
-        r1 = temp("results/reads/fastp/{sample}_r1.trimmed.fq.gz"),
-        html = "results/reads/fastp/{sample}_fastp.html",
-        json = "results/reads/fastp/{sample}_fastp.json"
+        r1 = temp("results/reads/fastp-se/{sample}_r1.trimmed.fq.gz"),
+        html = "results/reads/fastp-se/{sample}_fastp.html",
+        json = "results/reads/fastp-se/{sample}_fastp.json"
     threads:
         12
     resources:
@@ -35,10 +35,10 @@ rule fastp_trim_pe:
         r1=rules.concat_pe_runs.output.r1,
         r2=rules.concat_pe_runs.output.r2,
     output:
-        r1 = temp("results/reads/fastp/{sample}_r1.trimmed.fq.gz"),
-        r2 = temp("results/reads/fastp/{sample}_r2.trimmed.fq.gz"),
-        html = "results/reads/fastp/{sample}_fastp.html",
-        json = "results/reads/fastp/{sample}_fastp.json"
+        r1 = temp("results/reads/fastp-pe/{sample}_r1.trimmed.fq.gz"),
+        r2 = temp("results/reads/fastp-pe/{sample}_r2.trimmed.fq.gz"),
+        html = "results/reads/fastp-pe/{sample}_fastp.html",
+        json = "results/reads/fastp-pe/{sample}_fastp.json"
     threads:
         12
     resources:

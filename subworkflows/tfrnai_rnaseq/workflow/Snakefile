@@ -11,11 +11,11 @@ print(SAMPLES)
 
 SUBSAMPLE_TABLE = pep.subsample_table
 
-subworkflow main_wf:
+subworkflow refs_wf:
     workdir:
-        "../../../"
+        "../../references/"
     snakefile:
-        "../../../workflow/Snakefile"
+        "../../references/workflow/Snakefile"
 
 rule all:
     input:

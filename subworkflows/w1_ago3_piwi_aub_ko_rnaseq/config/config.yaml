@@ -1,0 +1,53 @@
+# --------------------------- housekeeping -------------------------------------
+PEP: config/pep.yaml
+RUN_TYPE: FULL # full, test
+
+# --------------------------- Reference data -----------------------------------
+
+# consensus transposon set to use
+CONSENSUS_TE_FASTA: resources/Tidalbase_transposon_sequence.fasta.gz # must be gz
+
+# references/resources and version data
+FULL_TRANSCRIPT_FASTA: resources/dmel-all-transcript-r6.41.fasta.gz # must be gz
+GENOME_FASTA: resources/dmel-all-chromosome-r6.41.fasta.gz
+TRANSCRIPTOME_GTF: resources/dmel-all-r6.41.gtf
+FLYBASE_RELEASE: FB2021_04
+GENOME_VERSION: r6.41
+
+#Generate with: https://github.com/mal2017/genome-plus-repeats/tree/e14fed1
+COMBINED_TE_GENOME_FA: resources/plus-repeats.fasta.gz
+COMBINED_TE_FEATURE_GTF: resources/plus-repeats.gtf
+
+
+# --------------------------- job options --------------------------------------
+FASTERQDUMP_MEM: 24000
+
+# Salmon indices for standard quantification approach
+SALMON_K_PARAM: 31
+
+# Salmon quant (standard quantification approach)
+SALMON_VANILLA_BOOTSTRAPS: 20
+SALMON_VANILLA_LIBTYPE: A
+SALMON_VANILLA_SEQBIAS: TRUE
+SALMON_VANILLA_GCBIAS: TRUE
+SALMON_VANILLA_POSBIAS: TRUE
+SALMON_VANILLA_USE_AUXTARGETS: FALSE
+SALMON_VANILLA_USE_DECOYS: TRUE
+SALMON_VANILLA_SOFTCLIP: TRUE
+
+# Tximport
+# these values will be "counts" for all downstream approaches. This is
+# relevant as the input to DESeq2 but also because some normalizations are run
+# on these directly. So, that means those normalizations are run on totally raw
+# counts if the params below == "no"
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE: scaledTPM # no, scaledTPM, lengthScaledTPM
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TXOUT: dtuScaledTPM # no, scaledTPM, lengthScaledTPM, dtuScaledTPM
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS: scaledTPM # no, scaledTPM, lengthScaledTPM
+
+# export of expression to a tab sep matrix. Multiple export units/norms/transforms
+# are available. Also possible is normalization to estimated TE copy number,
+# which necessarily is performed prior to vst, fpkm, etc, quantile norm, etc.
+# 'INCL copy estimation in export' only controls whether this information is generated.
+# there will always be two exports for each export type, but if INCL_COPY_ESTIMATION_IN_EXPORT is
+# TRUE, the -""
+EXPORT_UNITS: ["vst"] # ["vst","counts","normcts","fpkm","abundance","cpm","uq","qn"]

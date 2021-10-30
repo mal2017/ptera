@@ -1,150 +1,28 @@
-localrules: salmon_decoy_get_ids
+localrules: copy_salmon_indices_to_mount
 
-rule salmon_decoy_mask_exons:
+rule copy_salmon_indices_to_mount:
     """
-    We generated a partial decoy-aware transcriptome reference for salmon as described
-    in the [salmon documentation](https://salmon.readthedocs.io/en/latest/salmon.html#preparing-transcriptome-indices-mapping-based-mode).
-    Briefly, we began by extracting exon genomic coordinates and masking them with bedtools
-    v2.30.0 maskfasta.
+    Copy to a dir that singularity will see.
     """
     input:
-        gtf = config.get("TRANSCRIPTOME_GTF"),
-        genome = config.get("GENOME_FASTA")
+        index = refs_wf("results/indices/vanilla_salmon_tes_transcripts/index/"),
+        aux = refs_wf("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt"),
+        fasta = refs_wf("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz"),
+        gtf = refs_wf("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf"),
+        tx2gene = refs_wf("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2txsymbol.tsv"),
     output:
-        exons = "results/quantification/vanilla_salmon_tes_transcripts/decoy/exons.bed",
-        genome = "results/quantification/vanilla_salmon_tes_transcripts/decoy/genome.fasta",
-        masked = "results/quantification/vanilla_salmon_tes_transcripts/decoy/txome.masked.genome.fasta"
-    singularity:
-        "docker://quay.io/biocontainers/bedtools:2.30.0--h7d7f7ad_2"
-    resources:
-        time=10,
-        mem=5000,
-        cpus=1
-    priority: 50
+        index = temp(directory("results/indices/vanilla_salmon_tes_transcripts/index/")),
+        aux = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt"),
+        fasta = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz"),
+        gtf = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf"),
+        tx2gene = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2txsymbol.tsv"),
     shell:
         """
-        awk -v OFS='\\t' '{{if ($3=="exon") {{print $1,$4,$5}}}}' {input.gtf} > {output.exons} &&
-        gunzip -c {input.genome} > {output.genome} &&
-        bedtools maskfasta -fi {output.genome} -bed {output.exons} -fo {output.masked}
-        """
-
-rule salmon_decoy_mashmap_align_txome:
-    """
-    Next, we applied mashmap v2.0 with options "--pi 80 -s 500" to identify non-genic regions with similarity
-    to the transcriptome.
-    """
-    input:
-        masked = rules.salmon_decoy_mask_exons.output.masked,
-        txpfile = config.get("FULL_TRANSCRIPT_FASTA")
-    output:
-        mm = "results/quantification/vanilla_salmon_tes_transcripts/decoy/mashmap.out",
-        txlike = "results/quantification/vanilla_salmon_tes_transcripts/decoy/genome_found.sorted.bed",
-    threads:
-        8
-    singularity:
-        "docker://quay.io/biocontainers/mashmap:2.0--h543ed2d_4"
-    log:
-        "results/logs/mashmap/transcripts_and_consensus_tes.txt"
-    resources:
-        time=20,
-        mem=15000,
-        cpus=8
-    priority: 50
-    shell:
-        """
-        mashmap -r {input.masked} -q {input.txpfile} -t {threads} --pi 80 -s 500 -o {output.mm} 2> {log} &&
-        awk -v OFS='\\t' '{{print $6,$8,$9}}' {output.mm} | sort -k1,1 -k2,2n - > {output.txlike}
-        """
-
-rule salmon_decoy_finalize:
-    """
-    We extracted the sequence of the transcriptome-similar regions with bedtools getfasta.
-    Finally, we concatenated the custom TE and transcriptome reference sequences with the decoy
-    sequences to generate the decoy-aware transcriptome reference which we provided to salmon index.
-    """
-    input:
-        txlike = rules.salmon_decoy_mashmap_align_txome.output.txlike,
-        masked = rules.salmon_decoy_mask_exons.output.masked,
-        txpfile = rules.make_transcripts_and_consensus_tes_fasta.output.fa,
-    output:
-        txpfile = "results/quantification/vanilla_salmon_tes_transcripts/decoy/txpfile.fasta",
-        txlike_merged = "results/quantification/vanilla_salmon_tes_transcripts/decoy/genome_found_merged.bed",
-        txlike_fa = "results/quantification/vanilla_salmon_tes_transcripts/decoy/genome_found.fasta",
-        decoy = "results/quantification/vanilla_salmon_tes_transcripts/decoy/decoy.fasta",
-        gentrome = "results/quantification/vanilla_salmon_tes_transcripts/decoy/gentrome.fasta",
-        masked_fai = "results/quantification/vanilla_salmon_tes_transcripts/decoy/txome.masked.genome.fasta.fai"
-    singularity:
-        "docker://quay.io/biocontainers/bedtools:2.30.0--h7d7f7ad_2"
-    resources:
-        time=10,
-        mem=5000,
-        cpus=1
-    priority: 50
-    shell:
-        """
-        gunzip -c {input.txpfile} > {output.txpfile} &&
-        bedtools merge -i {input.txlike} > {output.txlike_merged} &&
-        bedtools getfasta -fi {input.masked} -bed {output.txlike_merged} -fo {output.txlike_fa} &&
-        awk '{{a=$0; getline;split(a, b, ":");  r[b[1]] = r[b[1]]""$0}} END {{ for (k in r) {{ print k"\\n"r[k] }} }}' {output.txlike_fa} > {output.decoy} &&
-        cat {output.txpfile} {output.decoy} > {output.gentrome}
-        """
-
-rule salmon_decoy_get_ids:
-    input:
-        decoy = rules.salmon_decoy_finalize.output.decoy
-    output:
-        ids = "results/quantification/vanilla_salmon_tes_transcripts/decoy/decoy.txt"
-    priority: 50
-    shell:
-        """
-        grep ">" {input.decoy} | awk '{{print substr($1,2); }}' > {output.ids}
-        """
-
-rule salmon_index_transcripts_and_consensus_tes:
-    """
-    We indexed the custom transcriptome with salmon v1.5.2 index using "-k <insert k here>."
-    """
-    input:
-        fa = rules.salmon_decoy_finalize.output.gentrome if config.get("SALMON_VANILLA_USE_DECOYS") else rules.make_transcripts_and_consensus_tes_fasta.output.fa,
-        decoyids = rules.salmon_decoy_get_ids.output.ids if config.get("SALMON_VANILLA_USE_DECOYS") else rules.make_transcripts_and_consensus_tes_fasta.output.dummy_decoy,
-    output:
-        directory("results/quantification/vanilla_salmon_tes_transcripts/index/")
-    params:
-        k = config.get("SALMON_K_PARAM"),
-        dec = "--decoys results/quantification/vanilla_salmon_tes_transcripts/decoy/decoy.txt" if config.get("SALMON_VANILLA_USE_DECOYS") else ""
-    singularity:
-        "docker://quay.io/biocontainers/salmon:1.5.2--h84f40af_0"
-    threads:
-        8
-    log:
-        "results/logs/salmon_index/transcripts_and_consensus_tes.txt"
-    resources:
-        time=60,
-        mem=20000,
-        cpus=8
-    priority: 50
-    shell:
-        """
-        salmon index -t {input.fa} \
-            --index {output} \
-            -k {params.k} \
-            -p {threads} \
-            {params.dec} 2> {log}
-        """
-
-rule make_salmon_te_aux_target_file:
-    """
-    TEs were provided as auxiliary targets to salmon to avoid applying bias correction
-    to TE expression estimates.
-    """
-    input:
-        tes = config.get("CONSENSUS_TE_FASTA"),
-    output:
-        "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt"
-    priority: 50
-    shell:
-        """
-        zcat {input.tes} | grep ">" | tr -d ">" > {output}
+        cp -r {input.index} {output.index}
+        cp {input.aux} {output.aux}
+        cp {input.fasta} {output.fasta}
+        cp {input.gtf} {output.gtf}
+        cp {input.tx2gene} {output.tx2gene}
         """
 
 rule salmon_quant_se_vanilla:
@@ -153,9 +31,9 @@ rule salmon_quant_se_vanilla:
     "<replace with options actually used>".
     """
     input:
-        fq1 = rules.fastp_trim_se.output.r1,
-        idx = rules.salmon_index_transcripts_and_consensus_tes.output,
-        aux = rules.make_salmon_te_aux_target_file.output,
+        reads = lambda wc: [rules.fastp_trim_pe.output.r1,rules.fastp_trim_pe.output.r2] if is_paired_end(wc.sample) else rules.fastp_trim_se.output.r1,
+        idx = rules.copy_salmon_indices_to_mount.output.index,
+        aux = rules.copy_salmon_indices_to_mount.output.aux,
     output:
         sf = "results/quantification/vanilla_salmon_tes_transcripts/quant/{sample}/quant.sf",
         #sam = temp("results/quantification/vanilla_salmon_tes_transcripts/{sample}/alignments/alignments.sam")
@@ -164,12 +42,13 @@ rule salmon_quant_se_vanilla:
         mem=20000,
         cpus=8
     params:
+        fq_args = lambda wc: " ".join([" ".join(x) for x in zip(["-1","-2"],expand("results/reads/fastp-pe/{s}_r{e}.trimmed.fq.gz",s=wc.sample,e=[1,2]))]) if is_paired_end(wc.sample) else "-r results/reads/fastp-se/{s}_r1.trimmed.fq.gz".format(s=wc.sample),
         libtype = config.get("SALMON_VANILLA_LIBTYPE"),
         bootstraps = "--numBootstraps {n}".format(n=config.get("SALMON_VANILLA_BOOTSTRAPS")) if config.get("SALMON_VANILLA_BOOTSTRAPS") else "",
         seqbias = "--seqBias" if config.get("SALMON_VANILLA_SEQBIAS") else "",
         gcbias = "--gcBias" if config.get("SALMON_VANILLA_GCBIAS") else "",
         posbias = "--posBias" if config.get("SALMON_VANILLA_POSBIAS") else "",
-        auxtargetfile = "--auxTargetFile {x}".format(x="results/references_and_indices/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt") if config.get("SALMON_VANILLA_USE_AUXTARGETS") else "",
+        auxtargetfile = "--auxTargetFile {x}".format(x="results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt") if config.get("SALMON_VANILLA_USE_AUXTARGETS") else "",
         softclip = "--softclip" if config.get("SALMON_VANILLA_SOFTCLIP") else "",
     threads:
         8
@@ -182,7 +61,7 @@ rule salmon_quant_se_vanilla:
         """
         salmon quant --index {input.idx} \
             --libType {params.libtype} \
-            -r {input.fq1} \
+            {params.fq_args} \
             {params.bootstraps} \
             {params.seqbias} \
             {params.gcbias} \
@@ -195,121 +74,29 @@ rule salmon_quant_se_vanilla:
             -o $(dirname {output.sf})/ 2> {log}
         """
 
-# rule vanilla_salmon_terminus_group:
-#     """
-#     To collapse transcripts to quantifiable clusters for which expression could be accurately estimated,
-#     we applied terminus v0.1.0 group with default parameters.
-#     """
-#     input:
-#         rules.salmon_quant_se_vanilla.output.sf
-#     output:
-#         directory("results/quantification/vanilla_salmon_tes_transcripts/terminus/{sample}/"),
-#     singularity:
-#         "docker://quay.io/biocontainers/terminus:0.1.0--hd24f7c9_2"
-#     log:
-#         "results/logs/vanilla_salmon_terminus_group/{sample}.txt"
-#     resources:
-#         time=10,
-#         mem=5000,
-#         cpus=1
-#     shell:
-#         "terminus group -d $(dirname {input}) -o $(dirname {output}) 2> {log}"
-
-# rule vanilla_salmon_terminus_collapse:
-#     """
-#     We used terminus collapse to recalculate expression estimates for all samples.
-#     """
-#     input:
-#         salm = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf", s=SAMPLES),
-#         term = expand("results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/", s=SAMPLES)
-#     output:
-#         touch("results/quantification/vanilla_salmon_tes_transcripts/terminus.done")
-#     params:
-#         od = "results/quantification/vanilla_salmon_tes_transcripts/terminus",
-#         salm = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}", s=SAMPLES),
-#     singularity:
-#         "docker://quay.io/biocontainers/terminus:0.1.0--hd24f7c9_2"
-#     resources:
-#         time=10,
-#         mem=5000,
-#         cpus=1
-#     log:
-#         "results/logs/vanilla_salmon_terminus_collapse/log.txt"
-#     shell:
-#         """
-#         terminus collapse -d {params.salm} -o {params.od} 2> {log}
-#        """
-
-# rule vanilla_salmon_terminus_txp2group:
-#     """
-#     Sample 1 is used as a template for the tx2group files.
-#     """
-#     input:
-#         coll = rules.vanilla_salmon_terminus_collapse.output,
-#         grp = "results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/".format(s=SAMPLES[0]),
-#         sf = "results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf".format(s=SAMPLES[0]),
-#     output:
-#         tx2group = temp("results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.raw.csv")
-#     params:
-#         cluster = "results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/clusters.txt".format(s=SAMPLES[0]),
-#     resources:
-#         time=10,
-#         mem=5000,
-#         cpus=1
-#     shell:
-#         """
-#         python workflow/scripts/extract_txp_group.py {input.sf} {params.cluster} {output.tx2group}
-#         """
-
-# rule vanilla_salmon_terminus_txp2group_clean:
-#     """
-#     Sample 1 is used as a template for the tx2group files.
-#     """
-#     input:
-#         raw = rules.vanilla_salmon_terminus_txp2group.output.tx2group,
-#         tx2id = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2id,
-#         tx2symbol = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2symbol,
-#         tx2txsymbol = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2txsymbol,
-#     output:
-#         tx2group = "results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.tsv"
-#     resources:
-#         time=10,
-#         mem=5000,
-#         cpus=1
-#     script:
-#         "../scripts/clean_txp2group.R"
-
-
-
 rule vanilla_salmon_tximeta:
     """
     tximeta was used to summarize expression estimates and include metadata in summarizedExperiment objects.
     """
     input:
-        idx = rules.salmon_index_transcripts_and_consensus_tes.output,
-        fasta = rules.make_transcripts_and_consensus_tes_fasta.output.fa,
-        gtf = rules.make_transcripts_and_consensus_tes_gtf.output.gtf,
+        idx = rules.copy_salmon_indices_to_mount.output.index,
+        fasta = rules.copy_salmon_indices_to_mount.output.fasta,
+        gtf = rules.copy_salmon_indices_to_mount.output.gtf,
         samples = "config/sample_table.csv", # TODO make this the output of the anno rule
         salmon_files = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf", s=SAMPLES),
-        #terminus = rules.vanilla_salmon_terminus_collapse.output,
-        #raw = rules.vanilla_salmon_terminus_txp2group.output.tx2group,
-        tx2gene = rules.make_transcripts_and_consensus_tes_tx2gene.output.tx2symbol, # TODO - automatically groups by gene id with TXImeta, but maybe worth making sure
-        #tx2feature = rules.vanilla_salmon_terminus_txp2group_clean.output.tx2group,
+        tx2gene = rules.copy_salmon_indices_to_mount.output.tx2gene,
         pipeline_meta = rules.get_pipeline_info.output,
     output:
         json = "results/quantification/vanilla_salmon_tes_transcripts/tximeta.json",
         salmon = "results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds",
         salmon_tx ="results/quantification/vanilla_salmon_tes_transcripts/se.transcript.rds",
-        #terminus = "results/quantification/vanilla_salmon_tes_transcripts/terminus_se.rds",
     singularity:
         "docker://quay.io/biocontainers/bioconductor-tximeta:1.10.0--r41hdfd78af_0"
     params:
         flybase_release = config.get("FLYBASE_RELEASE"),
         genome_version = config.get("GENOME_VERSION"),
-        terminus_files = expand("results/quantification/vanilla_salmon_tes_transcripts/terminus/{s}/quant.sf", s=SAMPLES),
         counts_from_abundance_salmon = config.get("SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE"),
         counts_from_abundance_salmon_txout = config.get("SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TXOUT"),
-        counts_from_abundance_terminus = config.get("SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS"),
     resources:
         time=60,
         mem=128000,
@@ -318,36 +105,3 @@ rule vanilla_salmon_tximeta:
         "results/logs/vanilla_salmon_tximeta/log.txt"
     script:
         "../scripts/vanilla_salmon_tximeta.R"
-
-
-# rule vanilla_salmon_te_expression_per_copy:
-#     input:
-#         rds = "results/quantification/vanilla_salmon_tes_transcripts/se.{feature_level}.rds",
-#         copies = wgs_wf("results/copies/copies.tsv")
-#     output:
-#         "results/quantification/vanilla_salmon_tes_transcripts/se.{feature_level}.te_ct_per_copy.rds"
-#     script:
-#         "../scripts/vanilla_salmon_te_ct_per_copy.R"
-
-
-# rule vanilla_salmon_deseq2:
-#     input:
-#         se=rules.vanilla_salmon_tximeta.output.salmon
-#     output:
-#         dds="results/quantification/vanilla_salmon_tes_transcripts/dds.rds"
-#     params:
-#         formula = config.get("DESEQ2_LRT_FORMULA"),
-#         reduced = config.get("DESEQ2_LRT_REDUCED_FORMULA")
-#     resources:
-#         time=240,
-#         mem=64000,
-#         cpus=2
-#     threads:
-#         1
-#     singularity:
-#         "docker://quay.io/biocontainers/bioconductor-deseq2:1.32.0--r41h399db7b_0"
-#     log:
-#         "results/logs/vanilla_salmon_deseq2/log.txt"
-#     script:
-#         "../scripts/vanilla_salmon_deseq2.R"
-#

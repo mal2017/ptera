@@ -3,19 +3,20 @@ import peppy
 import glob
 
 configfile: "config/config.yaml"
-pepfile: config.get("PEP")
+pepfile: "config/pep.yaml"
 
 SAMPLES = [x.sample_name for x in pep.samples]
 SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:2]
-print(SAMPLES)
 
 SUBSAMPLE_TABLE = pep.subsample_table
+
 
 subworkflow refs_wf:
     workdir:
         "../../references/"
     snakefile:
         "../../references/workflow/Snakefile"
+
 
 rule all:
     input:

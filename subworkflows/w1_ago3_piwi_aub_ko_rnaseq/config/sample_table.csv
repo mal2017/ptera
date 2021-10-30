@@ -1,0 +1,13 @@
+sample_name,Genotype
+piwi[2]_piwi[dN]_SRR1924201,piwi[2]/piwi[dN]
+piwi[2]_piwi[dN]_SRR1924202,piwi[2]/piwi[dN]
+aub[HN2]_aub[QC42]_SRR1924203,aub[HN2]/aub[QC42]
+aub[HN2]_aub[QC42]_SRR1924204,aub[HN2]/aub[QC42]
+ago3[t2]_ago3[t3]_SRR1924205,ago3[t2]/ago3[t3]
+ago3[t2]_ago3[t3]_SRR1924206,ago3[t2]/ago3[t3]
+aub[HN2]_aub[QC42]_ago3[t2]_ago3[t3]_SRR1924207,aub[HN2]/aub[QC42]; ago3[t2]/ago3[t3]
+aub[HN2]_aub[QC42]_ago3[t2]_ago3[t3]_SRR1924208,aub[HN2]/aub[QC42]; ago3[t2]/ago3[t3]
+piwi[2]_piwi[dN]_ago3[t2]_ago3[t3]_SRR1924209,piwi[2]/piwi[dN]; ago3[t2]/ago3[t3]
+piwi[2]_piwi[dN]_ago3[t2]_ago3[t3]_SRR1924210,piwi[2]/piwi[dN]; ago3[t2]/ago3[t3]
+w1_SRR1783725,w1
+w1_SRR1783726,w1

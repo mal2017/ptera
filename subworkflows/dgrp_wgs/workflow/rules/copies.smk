@@ -5,8 +5,8 @@ rule wgs_mosdepth:
     Here I just allow multimappers because
     """
     input:
-        cram = rules.wgs_samtools_markdup.output.cram,
-        ref = rules.wgs_copy_resos_for_singularity.output.ref
+        cram = rules.dna_samtools_markdup.output.cram,
+        ref = rules.copy_bwa_mem2_indices_to_mount.output.ref
     output:
         multiext('results/depth/{sample}','.mosdepth.global.dist.txt','.mosdepth.region.dist.txt', ".mosdepth.summary.txt", ".regions.bed.gz",".regions.bed.gz.csi")
     threads:
@@ -31,7 +31,7 @@ rule wgs_mosdepth:
 rule wgs_estimate_te_copies:
     input:
         cov = 'results/depth/{sample}.mosdepth.summary.txt',
-        fl = main_wf("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2symbol.tsv")
+        fl = refs_wf("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2symbol.tsv")
     output:
         csv = 'results/copies/by_strain/{sample}.csv'
     resources:

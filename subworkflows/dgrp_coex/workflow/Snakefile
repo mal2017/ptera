@@ -1,0 +1,48 @@
+import sys
+import peppy
+import glob
+
+configfile: "config/config.yaml"
+pepfile: config.get("PEP")
+
+SAMPLES = [x.sample_name for x in pep.samples]
+SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:4]
+
+SUBSAMPLE_TABLE = pep.subsample_table
+
+subworkflow wgs_wf:
+    workdir:
+        "../../dgrp_wgs/"
+    snakefile:
+        "../../dgrp_wgs/workflow/Snakefile"
+
+subworkflow refs_wf:
+    workdir:
+        "../../references/"
+    snakefile:
+        "../../references/workflow/Snakefile"
+
+subworkflow main_wf:
+    workdir:
+        "../../../"
+    snakefile:
+        "../../../workflow/Snakefile"
+
+rule all:
+    input:
+        expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf",s=SAMPLES),
+        expand("results/linear_models/{m}/lm.{r}.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),
+        #expand("results/linear_models/{m}/coefs.mat.tsv.gz",m=config.get("LM_MODELS_TO_FIT")),
+        #wgs_wf("results/copies/copies.tsv")
+        #expand("results/linear_models/{lms}/lm.{r}.tsv.gz",lms=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),
+        #expand("results/reads/fastp/{s}_r1.trimmed.fq.gz",s="DGRP_Line_100_Female_SAMN09738660")
+        #expand("results/reads/dump/{s}/{e}/{r}/",s="DGRP_Line_100_Female_SAMN09738660",e=["SRX4483514"],r=['SRR7619150', 'SRR7619149'])
+
+include: "../../../workflow/rules/download.smk"
+include: "../../../workflow/rules/trim.smk"
+include: "../../../workflow/rules/utils.smk"
+include: "../../../workflow/rules/vanilla_salmon.smk"
+include: "../../../workflow/rules/metadata.smk"
+include: "../../../workflow/rules/repeatmasker.smk"
+include: "../../../workflow/rules/feature_overlap.smk"
+include: "../../../workflow/rules/linear_modeling.smk"
