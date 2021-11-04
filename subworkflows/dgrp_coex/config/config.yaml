@@ -2,7 +2,8 @@
 PEP: config/pep.yaml
 RUN_TYPE: test # full, test
 
-
+FLYBASE_RELEASE: FB2021_04
+GENOME_VERSION: r6.41
 
 # --------------------------- job options --------------------------------------
 FASTERQDUMP_MEM: 24000

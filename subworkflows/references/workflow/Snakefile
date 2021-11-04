@@ -2,7 +2,7 @@ import sys
 import peppy
 import glob
 
-configfile: "../../config/config.yaml"
+configfile: "config/config.yaml"
 
 rule all:
     input:

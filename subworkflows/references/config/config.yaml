@@ -17,3 +17,6 @@ GENOME_VERSION: r6.41
 #Generate with: https://github.com/mal2017/genome-plus-repeats/tree/e14fed1
 COMBINED_TE_GENOME_FA: ../../resources/plus-repeats.fasta.gz
 COMBINED_TE_FEATURE_GTF: ../../resources/plus-repeats.gtf
+
+# Salmon indices for standard quantification approach
+SALMON_K_PARAM: 31
