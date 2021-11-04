@@ -16,6 +16,7 @@ rule copy_salmon_indices_to_mount:
         fasta = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz"),
         gtf = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf"),
         tx2gene = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2txsymbol.tsv"),
+    priority: 51
     shell:
         """
         cp -r {input.index} {output.index}
