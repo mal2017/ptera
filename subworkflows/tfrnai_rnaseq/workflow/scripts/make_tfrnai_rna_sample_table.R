@@ -1,12 +1,12 @@
 library(tidyverse)
 
-df <- read_csv("../../resources/tfrnai_rnaseq_srarunselector.txt") %>%
+df <- read_csv("../../resources/full_tfrnai_srarunselector.txt") %>%
   set_tidy_names(syntactic = T)
 
 df2 <- df %>%
-  dplyr::select(rnai=RNAi_target_gene_name, Assay.Type,  LibraryLayout, LibrarySource, LibrarySelection, Strain = Cell_Line, Instrument, Experiment, Run, BioSample, Sample.Name) %>%
+  dplyr::select(rnai=RNAi_target_gene_name, Assay.Type,  LibraryLayout, LibrarySource, LibrarySelection, Strain = cell_line, Instrument, Experiment, Run, BioSample, Sample.Name) %>%
   distinct() %>%
-  mutate(sample_name = paste(rnai,Sample.Name, sep="_"))
+  mutate(sample_name = paste(rnai,Run, sep="_"))
 
 df2 <- df2 %>%
   dplyr::relocate(sample_name, rnai)

@@ -1,7 +1,7 @@
 library(rtracklayer)
 
 tefafile <- snakemake@input[["te_fasta"]] 
-# tefafile <- "resources/Tidalbase_transposon_sequence.fasta.gz" # tefafile <- "resources/dmel_repbase_lib.fasta.gz"
+# tefafile <- "../../resources/Tidalbase_transposon_sequence.fasta.gz" # tefafile <- "resources/dmel_repbase_lib.fasta.gz"
 gtffile <- snakemake@input[["host_gtf"]] 
 # gtffile <- "resources/dmel-all-r6.41.gtf"
 

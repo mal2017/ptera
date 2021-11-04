@@ -1,10 +1,7 @@
 # --------------------------- housekeeping -------------------------------------
 PEP: config/pep.yaml
-RUN_TYPE: test # full, test
+RUN_TYPE: FULL # full, test
+
 
 # --------------------------- job options --------------------------------------
 FASTERQDUMP_MEM: 24000
-
-# mosdepth for te copy estimation
-MOSDEPTH_WINDOW_SIZE: 100
-MOSDEPTH_SAM_FLAG_EXCLUDE: 1540 # allows multimappers

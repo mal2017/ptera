@@ -48,6 +48,9 @@ rule dna_bwa_mem2_align:
         """
 
 rule dna_samtools_fixmate:
+    """
+    Adds mate score info. Note that this works because bwa-mem2 output is name-grouped
+    """
     input:
         sam = rules.dna_bwa_mem2_align.output,
         ref = rules.copy_bwa_mem2_indices_to_mount.output.ref
@@ -108,7 +111,7 @@ rule dna_samtools_markdup:
     priority: 2
     shell:
         """
-        samtools markdup -@ {threads} --reference {input.ref} -O CRAM \
+        samtools markdup -@ {threads} --reference {input.ref} -O CRAM,embed_ref \
             {input.cram} {output.cram} &&
         samtools index -@ {threads} {output.cram}
         """

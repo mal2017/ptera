@@ -1,0 +1,56 @@
+import sys
+import peppy
+import glob
+
+configfile: "config/config.yaml"
+pepfile: config.get("PEP")
+
+SAMPLES = [x.sample_name for x in pep.samples]
+SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:1]
+
+SUBSAMPLE_TABLE = pep.subsample_table
+
+subworkflow refs_wf:
+    workdir:
+        "../../references/"
+    snakefile:
+        "../../references/workflow/Snakefile"
+
+rule all:
+    input:
+        expand("results/bigwigs/dna_bwa_mem2/{s}.bw",s=SAMPLES),
+        #expand("results/mapping/dna_bwa_mem2/{s}.markdup.{f}",s=SAMPLES,f=["cram","cram.crai"])
+
+include: "../../../workflow/rules/utils.smk"
+include: "../../../workflow/rules/download.smk"
+include: "../../../workflow/rules/trim.smk"
+include: "../../../workflow/rules/align.smk"
+
+
+rule starrseq_bigwig:
+    input:
+        cram = "results/mapping/dna_bwa_mem2/{s}.markdup.cram",
+        crai = "results/mapping/dna_bwa_mem2/{s}.markdup.cram.crai",
+    output:
+        "results/bigwigs/dna_bwa_mem2/{s}.bw"
+    singularity:
+        "docker://quay.io/biocontainers/deeptools:3.5.1--py_0"
+    threads:
+        4
+    params:
+        norm = "CPM"
+    resources:
+        time=240,
+        mem=20000,
+        cpus=12
+    shell:
+        """
+        bamCoverage -b {input.cram} \
+            --outFileName {output} \
+            --outFileFormat bigwig \
+            --binSize 50 \
+            --smoothLength 150 \
+            -p {threads} \
+            --verbose \
+            --normalizeUsing {params.norm}
+        """

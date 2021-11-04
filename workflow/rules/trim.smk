@@ -50,7 +50,7 @@ rule fastp_trim_pe:
     priority: 3
     shell:
         """
-        fastp --in1 {input.r1} --in2 {input.r1} \
+        fastp --in1 {input.r1} --in2 {input.r2} \
         --out1 {output.r1} --out2 {output.r2} \
         -j {output.json} -h {output.html} \
         -w {threads} -L -R {wildcards.sample}_fastp
