@@ -10,6 +10,12 @@ SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:4]
 
 SUBSAMPLE_TABLE = pep.subsample_table
 
+subworkflow refs_wf:
+    workdir:
+        "../subworkflows/references/"
+    snakefile:
+        "../subworkflows/references/workflow/Snakefile"
+
 subworkflow wgs_wf:
     workdir:
         "../subworkflows/dgrp_wgs/"
