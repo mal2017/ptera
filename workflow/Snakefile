@@ -28,12 +28,6 @@ subworkflow dgrp_coex_wf:
     snakefile:
         "../subworkflows/dgrp_coex/workflow/Snakefile"
 
-subworkflow main_wf:
-    workdir:
-        "."
-    snakefile:
-        "workflow/Snakefile"
-
 
 rule all:
     input:
@@ -47,6 +41,4 @@ include: "rules/trim.smk"
 include: "rules/utils.smk"
 include: "rules/vanilla_salmon.smk"
 include: "rules/metadata.smk"
-include: "rules/repeatmasker.smk"
-include: "rules/feature_overlap.smk"
 include: "rules/linear_modeling.smk"

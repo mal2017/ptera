@@ -63,7 +63,7 @@ rule chunked_linear_model:
         chunk = "results/linear_models/{model_id}/chunk_{lmchunk}",
         dat = rules.filter_transform_scale.output.mat,
         cd = rules.collect_metadata.output,
-        ol = main_wf("results/overlaps/overlaps.tsv.gz"),
+        ol = refs_wf("results/overlaps/overlaps.tsv.gz"),
         copies = wgs_wf("results/copies/copies.tsv") if config.get("INCL_COPY_ESTIMATION_IN_EXPORT") else rules.dummy_copies.output.feats
     output:
         tidy = temp("results/linear_models/{model_id}/chunk_{lmchunk}.tidy.tsv"),

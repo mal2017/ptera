@@ -2,8 +2,8 @@ localrules: copy_for_rpm
 
 rule copy_for_rpm:
     input:
-        repeats = config.get("CONSENSUS_TE_FASTA"),
-        fasta = config.get('GENOME_FASTA'),
+        repeats =  rules.get_resources_in_mount.output.CONSENSUS_TE_FASTA,
+        fasta = rules.get_resources_in_mount.output.GENOME_FASTA
     output:
         fasta = temp('results/repeatmasker/genome.fasta'),
         repeats = temp('results/repeatmasker/repeats.fasta'),

@@ -1,6 +1,6 @@
 rule extract_polymorphic_insertions_0:
     input:
-        "resources/Tidal_Fly_v1Archive20150930.zip"
+        "../../resources/Tidal_Fly_v1Archive20150930.zip"
     output:
         dgn = temp("results/overlaps/polymorphic_insertions/DGN_flies.zip"),
         labstrain = temp("results/overlaps/polymorphic_insertions/LabStrain_flies.zip"),
@@ -28,15 +28,15 @@ checkpoint extract_polymorphic_insertions:
         unzip {input} -d {output}
         """
 
-rule get_reference_copies:
-    input:
-        "resources/repmasker_dm6_track.txt"
-    output:
-        "results/overlaps/reference_tes/reference_tes.bed"
-    shell:
-        """
-        cut -f 6,7,8,10,11 {input} | tail -n+2 | awk -F'\t' 'BEGIN {{OFS = FS}} {{t=$4; $4=$5 FS "0" FS t;print}}' | cut -f 1,2,3,4,5,6 > {output}
-        """
+# rule get_reference_copies:
+#     input:
+#         "resources/repmasker_dm6_track.txt"
+#     output:
+#         "results/overlaps/reference_tes/reference_tes.bed"
+#     shell:
+#         """
+#         cut -f 6,7,8,10,11 {input} | tail -n+2 | awk -F'\t' 'BEGIN {{OFS = FS}} {{t=$4; $4=$5 FS "0" FS t;print}}' | cut -f 1,2,3,4,5,6 > {output}
+#         """
 
 rule get_per_strain_insertions:
     input:
@@ -89,7 +89,7 @@ rule collect_all_tidal_insertions:
 
 rule feature_overlaps:
     input:
-        genes = config.get("TRANSCRIPTOME_GTF"),
+        genes = rules.get_resources_in_mount.output.TRANSCRIPTOME_GTF,
         ins = rules.collect_all_tidal_insertions.output
     output:
         tsv="results/overlaps/overlaps.tsv.gz"

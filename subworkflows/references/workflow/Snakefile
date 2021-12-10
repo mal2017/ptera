@@ -2,14 +2,18 @@ import sys
 import peppy
 import glob
 
-configfile: "config/config.yaml"
+configfile: "../../config/config.yaml"
 
 rule all:
     input:
         "results/indices/vanilla_salmon_tes_transcripts/index/",
         expand("results/indices/bwa_mem2/idx.{suf}",suf=["0123","amb","ann","bwt.2bit.64","pac"]),
-        "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt"
+        "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt",
+        "results/repeatmasker/reference_insertions.bed",
+        "results/overlaps/overlaps.tsv.gz"
 
 include: "rules/resources.smk"
 include: "rules/references.smk"
 include: "rules/indices.smk"
+include: "rules/repeatmasker.smk"
+include: "rules/feature_overlap.smk"
