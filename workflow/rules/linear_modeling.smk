@@ -67,7 +67,7 @@ rule chunked_linear_model:
         copies = wgs_wf("results/copies/copies.tsv") if config.get("INCL_COPY_ESTIMATION_IN_EXPORT") else rules.dummy_copies.output.feats
     output:
         tidy = temp("results/linear_models/{model_id}/chunk_{lmchunk}.tidy.tsv"),
-        glance = temp("results/linear_models/{model_id}/chunk_{lmchunk}.glance.tsv"),
+        #glance = temp("results/linear_models/{model_id}/chunk_{lmchunk}.glance.tsv"),
         #aug = temp("results/linear_models/{model_id}/chunk_{lmchunk}.aug.tsv"),
         #fits = temp("results/linear_models/{model_id}/fits/chunk_{lmchunk}.fits.rds")
     params:
