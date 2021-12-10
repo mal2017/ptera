@@ -12,9 +12,15 @@ SUBSAMPLE_TABLE = pep.subsample_table
 
 subworkflow wgs_wf:
     workdir:
-        "../subworkflows/wgs/"
+        "../subworkflows/dgrp_wgs/"
     snakefile:
-        "../subworkflows/wgs/workflow/Snakefile"
+        "../subworkflows/dgrp_wgs/workflow/Snakefile"
+
+subworkflow dgrp_coex:
+    workdir:
+        "../subworkflows/dgrp_coex/"
+    snakefile:
+        "../subworkflows/dgrp_coex/workflow/Snakefile"
 
 rule all:
     input:
