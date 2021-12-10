@@ -1,0 +1,7 @@
+# --------------------------- housekeeping -------------------------------------
+PEP: config/pep.yaml
+RUN_TYPE: FULL # full, test
+
+
+# --------------------------- job options --------------------------------------
+FASTERQDUMP_MEM: 24000

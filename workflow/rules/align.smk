@@ -115,3 +115,25 @@ rule dna_samtools_markdup:
             {input.cram} {output.cram} &&
         samtools index -@ {threads} {output.cram}
         """
+
+rule dna_cram_to_bam_tmp:
+    """
+    CRAM is smaller, but some tools want bam
+    """
+    input:
+        rules.dna_samtools_markdup.output.cram
+    output:
+        bam = temp("results/mapping/dna_bwa_mem2/{sample}.markdup.bam"),
+        bai = temp("results/mapping/dna_bwa_mem2/{sample}.markdup.bam.bai")
+    singularity:
+        "docker://quay.io/biocontainers/samtools:1.13--h8c37831_0"
+    resources:
+        time=20,
+        mem=10000,
+        cpus=2
+    priority: 2
+    shell:
+        """
+        samtools view -b -o {output.bam} {input} &&
+        samtools index {output.bam}
+        """
