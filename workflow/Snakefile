@@ -16,7 +16,7 @@ subworkflow wgs_wf:
     snakefile:
         "../subworkflows/dgrp_wgs/workflow/Snakefile"
 
-subworkflow dgrp_coex:
+subworkflow dgrp_coex_wf:
     workdir:
         "../subworkflows/dgrp_coex/"
     snakefile:
@@ -24,8 +24,8 @@ subworkflow dgrp_coex:
 
 rule all:
     input:
-        expand("results/linear_models/{m}/coefs.mat.tsv.gz",m=config.get("LM_MODELS_TO_FIT")),
-        expand("results/linear_models/{m}/lm.{r}.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),
+        dgrp_coex_wf(expand("results/linear_models/{m}/coefs.mat.tsv.gz",m=config.get("LM_MODELS_TO_FIT"))),
+        dgrp_coex_wf(expand("results/linear_models/{m}/lm.{r}.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),r=["tidy"])),
         #wgs_wf("results/copies/copies.tsv")
 
 
