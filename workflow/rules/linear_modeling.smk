@@ -77,7 +77,7 @@ rule chunked_linear_model:
         mem=128000,
         cpus=1
     script:
-        "../scripts/linear_model_v02.R"
+        "../scripts/linear_model_v03.R"
 
 rule collect_chunked_linear_models:
     """
