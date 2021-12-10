@@ -28,6 +28,13 @@ subworkflow dgrp_coex_wf:
     snakefile:
         "../subworkflows/dgrp_coex/workflow/Snakefile"
 
+subworkflow main_wf:
+    workdir:
+        "."
+    snakefile:
+        "workflow/Snakefile"
+
+
 rule all:
     input:
         dgrp_coex_wf(expand("results/linear_models/{m}/coefs.mat.tsv.gz",m=config.get("LM_MODELS_TO_FIT"))),
