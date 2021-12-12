@@ -52,11 +52,9 @@ samples <- read.csv(samples_fl,header = T)
 
 # name the quant files so reordering is possible
 #files <- Sys.glob("results/quantification/vanilla_salmon_tes_transcripts/quant/*/quant.sf")
-#terminus_files <- Sys.glob("results/quantification/vanilla_salmon_tes_transcripts/terminus/*/quant.sf")
 files <- snakemake@input[["salmon_files"]]
-#terminus_files <- snakemake@params[["terminus_files"]]
+
 names(files) <- gsub("\\/+quant.sf","",x=gsub(".+quant\\/+","",files))
-#names(terminus_files) <- gsub("\\/+quant.sf","",x=gsub(".+terminus\\/+","",terminus_files))
 
 # useful for testing a smaller subset, also good as foolproofing
 # in case some samples aren't quantified and this script is run manually
@@ -64,21 +62,16 @@ samples <- samples[samples$sample_name %in% names(files),]
 
 # reorder to match sample table
 files <- files[samples$sample_name]
-#terminus_files <- terminus_files[samples$sample_name]
 
 samples$names <- samples$sample_name
 samples$files <- files
-#samples_terminus <- samples
-#samples_terminus$files <- samples_terminus$files <- terminus_files
 
 ## params for import
 #counts_from_abundance_salmon <- "lengthScaledTPM"
 #counts_from_abundance_salmon_txout <- "dtuScaledTPM"
-#counts_from_abundance_terminus <- "lengthScaledTPM"
 
 counts_from_abundance_salmon <- snakemake@params[["counts_from_abundance_salmon"]]
 counts_from_abundance_salmon_txout <- snakemake@params[["counts_from_abundance_salmon_txout"]]
-#counts_from_abundance_terminus <- snakemake@params[["counts_from_abundance_terminus"]]
 
 #tx2gene_fl <- "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2symbol.tsv"
 #tx2feature_fl <- "results/quantification/vanilla_salmon_tes_transcripts/terminus.tx2group.tsv"
@@ -87,11 +80,6 @@ tx2gene_fl <- snakemake@input[["tx2gene"]]
 
 # get the conversion for transcripts
 tx2gene <- read.table(tx2gene_fl,header = T)
-
-# get the conversion for the renamed terminus grps w/ symbols in the name
-#tx2feature <- read.table(tx2feature_fl,header = T)
-#rownames(tx2feature) <- tx2feature$TXNAME
-#tx2groupid_symbols <- tx2feature[,c("TXNAME","GROUPID_SYMBOLS")]
 
 salmon_tx_se <- tximeta(samples,
                      type="salmon",
@@ -103,6 +91,17 @@ salmon_tx_se <- tximeta(samples,
                      cleanDuplicateTxps = T,
                      markDuplicateTxps = T,
                      countsFromAbundance = counts_from_abundance_salmon_txout)
+
+gtf <- rtracklayer::import(tx_gtf)
+#summary(gtf$type)
+
+allowed.types <- c("mRNA","pseudogene","ncRNA")
+
+allowed.features <- unique(gtf[gtf$type %in% allowed.types]$transcript_id)
+
+# strictly speaking, not necessary as these types aren't quantified in the current pipeline.
+# assumes that TEs are type "mRNA" or at least one of the other allowed types above.
+salmon_tx_se <- salmon_tx_se[rownames(salmon_tx_se) %in% allowed.features,]
 
 salmon_se <- summarizeToGene(salmon_tx_se,countsFromAbundance = counts_from_abundance_salmon)
 
