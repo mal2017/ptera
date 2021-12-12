@@ -51,7 +51,7 @@ rule salmon_quant_se_vanilla:
         posbias = "--posBias" if config.get("SALMON_VANILLA_POSBIAS") else "",
         auxtargetfile = "--auxTargetFile {x}".format(x="results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt") if config.get("SALMON_VANILLA_USE_AUXTARGETS") else "",
         softclip = "--softclip" if config.get("SALMON_VANILLA_SOFTCLIP") else "",
-        incompat = "--incompatPrior {x}".format(x = config.get("SALMON_VANILLA_INCOMPATPRIOR")) if config.get("SALMON_VANILLA_INCOMPATPRIOR") else ""
+        incompat = "--incompatPrior 0.0" if config.get("SALMON_VANILLA_INCOMPATPRIOR_0") else ""
     threads:
         8
     log:
