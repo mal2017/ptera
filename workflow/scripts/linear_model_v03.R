@@ -1,6 +1,4 @@
 library(tidyverse)
-library(vroom)
-library(modelr)
 library(tls)
 
 
