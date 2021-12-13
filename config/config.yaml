@@ -21,3 +21,26 @@ COMBINED_TE_FEATURE_GTF: resources/plus-repeats.gtf
 
 # Salmon indices for standard quantification approach
 SALMON_K_PARAM: 31
+SALMON_VANILLA_USE_DECOYS: TRUE # note that this won't matter if
+
+# --------------------------- job options --------------------------------------
+FASTERQDUMP_MEM: 24000
+
+# Salmon quant (standard quantification approach)
+SALMON_VANILLA_BOOTSTRAPS: 20
+SALMON_VANILLA_LIBTYPE: SR # standard for dUTP, which the DGRP data is. Confirmed by aligning SAMN09738660 - reads map to (-) strand
+SALMON_VANILLA_SEQBIAS: TRUE
+SALMON_VANILLA_GCBIAS: TRUE
+SALMON_VANILLA_POSBIAS: TRUE
+SALMON_VANILLA_USE_AUXTARGETS: FALSE
+SALMON_VANILLA_SOFTCLIP: TRUE
+SALMON_VANILLA_INCOMPATPRIOR_0: TRUE
+
+# Tximport
+# these values will be "counts" for all downstream approaches. This is
+# relevant as the input to DESeq2 but also because some normalizations are run
+# on these directly. So, that means those normalizations are run on totally raw
+# counts if the params below == "no"
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE: scaledTPM # no, scaledTPM, lengthScaledTPM
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TXOUT: dtuScaledTPM # no, scaledTPM, lengthScaledTPM, dtuScaledTPM
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS: scaledTPM # no, scaledTPM, lengthScaledTPM
