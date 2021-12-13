@@ -134,17 +134,20 @@ rule salmon_index_transcripts_and_consensus_tes:
 
 rule make_salmon_te_aux_target_file:
     """
-    TEs were provided as auxiliary targets to salmon to avoid applying bias correction
+    TEs, miscRNAs, and tRNAs were provided as auxiliary targets to salmon to avoid applying bias correction
     to TE expression estimates.
     """
     input:
         tes = "results/" + config.get("CONSENSUS_TE_FASTA"),
+        miscrna = "results/" + config.get("MISCRNA_FASTA"),
+        trna = "results/" + config.get("TRNA_FASTA"),
     output:
         "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt"
     priority: 50
     shell:
         """
-        zcat {input.tes} | grep ">" | tr -d ">" > {output}
+        zcat {input.tes} | grep ">" | tr -d ">" > {output} &&
+        zcat {input.miscrna} {input.trna} | grep ">" | cut -f 1 -d " " | tr -d ">" >> {output}
         """
 
 rule dna_bwa_mem2_index:

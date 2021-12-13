@@ -5,12 +5,15 @@ rule make_transcripts_and_consensus_tes_fasta:
     """
     input:
         tes = "results/" + config.get("CONSENSUS_TE_FASTA"),
-        txs = "results/" + config.get("FULL_TRANSCRIPT_FASTA")
+        txs = "results/" + config.get("FULL_TRANSCRIPT_FASTA"),
+        trna = "results/" + config.get("TRNA_FASTA"),
+        ncrna = "results/" + config.get("NCRNA_FASTA"),
+        miscrna = "results/" + config.get("MISCRNA_FASTA"),
     output:
         fa = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz",
         dummy_decoy = touch("results/references/transcripts_and_consensus_tes/dummy_decoy.txt")
     shell:
-        "cat {input.tes} {input.txs} > {output.fa}"
+        "cat {input.tes} {input.txs} {input.trna} {input.ncrna} {input.miscrna} > {output.fa}"
 
 rule make_transcripts_and_consensus_tes_gtf:
     """

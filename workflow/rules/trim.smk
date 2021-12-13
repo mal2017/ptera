@@ -10,11 +10,11 @@ rule fastp_trim_se:
         html = "results/reads/fastp-se/{sample}_fastp.html",
         json = "results/reads/fastp-se/{sample}_fastp.json"
     threads:
-        12
+        6
     resources:
         time=60,
         mem=20000,
-        cpus=12
+        cpus=4
     singularity:
         "docker://quay.io/biocontainers/fastp:0.22.0--h2e03b76_0"
     priority: 3
@@ -40,11 +40,11 @@ rule fastp_trim_pe:
         html = "results/reads/fastp-pe/{sample}_fastp.html",
         json = "results/reads/fastp-pe/{sample}_fastp.json"
     threads:
-        12
+        6
     resources:
         time=60,
         mem=20000,
-        cpus=12
+        cpus=4
     singularity:
         "docker://quay.io/biocontainers/fastp:0.22.0--h2e03b76_0"
     priority: 3

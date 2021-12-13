@@ -7,10 +7,13 @@ configfile: "../../config/config.yaml"
 rule all:
     input:
         "results/indices/vanilla_salmon_tes_transcripts/index/",
-        expand("results/indices/bwa_mem2/idx.{suf}",suf=["0123","amb","ann","bwt.2bit.64","pac"]),
+        #expand("results/indices/bwa_mem2/idx.{suf}",suf=["0123","amb","ann","bwt.2bit.64","pac"]),
         "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt",
-        "results/repeatmasker/reference_insertions.bed",
-        "results/overlaps/overlaps.tsv.gz"
+        #"results/repeatmasker/reference_insertions.bed",
+        #"results/overlaps/overlaps.tsv.gz",
+        "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf",
+        "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2txsymbol.tsv"
+
 
 include: "rules/resources.smk"
 include: "rules/references.smk"

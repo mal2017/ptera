@@ -10,6 +10,11 @@ CONSENSUS_TE_FASTA: resources/Tidalbase_transposon_sequence.fasta.gz # must be g
 
 # references/resources and version data
 FULL_TRANSCRIPT_FASTA: resources/dmel-all-transcript-r6.41.fasta.gz # must be gz
+MISCRNA_FASTA: resources/dmel-all-miscRNA-r6.41.fasta.gz
+MIRNA_FASTA: resources/dmel-all-miRNA-r6.41.fasta.gz
+NCRNA_FASTA: resources/dmel-all-ncRNA-r6.41.fasta.gz
+TRNA_FASTA: resources/dmel-all-tRNA-r6.41.fasta.gz
+PSEUDOGENE_FASTA: resources/dmel-all-pseudogene-r6.41.fasta.gz
 GENOME_FASTA: resources/dmel-all-chromosome-r6.41.fasta.gz
 TRANSCRIPTOME_GTF: resources/dmel-all-r6.41.gtf
 FLYBASE_RELEASE: FB2021_04
@@ -32,7 +37,7 @@ SALMON_VANILLA_LIBTYPE: SR # standard for dUTP, which the DGRP data is. Confirme
 SALMON_VANILLA_SEQBIAS: TRUE
 SALMON_VANILLA_GCBIAS: TRUE
 SALMON_VANILLA_POSBIAS: TRUE
-SALMON_VANILLA_USE_AUXTARGETS: FALSE
+SALMON_VANILLA_USE_AUXTARGETS: TRUE
 SALMON_VANILLA_SOFTCLIP: TRUE
 SALMON_VANILLA_INCOMPATPRIOR_0: TRUE
 
