@@ -13,7 +13,7 @@ rule fastp_trim_se:
         6
     resources:
         time=60,
-        mem=20000,
+        mem=64000,
         cpus=4
     singularity:
         "docker://quay.io/biocontainers/fastp:0.22.0--h2e03b76_0"
@@ -43,7 +43,7 @@ rule fastp_trim_pe:
         6
     resources:
         time=60,
-        mem=20000,
+        mem=64000,
         cpus=4
     singularity:
         "docker://quay.io/biocontainers/fastp:0.22.0--h2e03b76_0"
