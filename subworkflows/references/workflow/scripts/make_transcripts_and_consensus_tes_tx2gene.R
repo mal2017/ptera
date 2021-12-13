@@ -4,9 +4,11 @@ gtffile <-  snakemake@input[["gtf"]] # gtffile <- "results/references/transcript
 
 gtf <- import(gtffile)
 
-# salmon only takes mRNA
-allowed_types <- c("mRNA")
-gtf2 <- gtf[gtf$type %in% allowed_types]
+# salmon only takes mRNA 
+# UPDATE 211213: Decided to quantify all and exclude unwated seqs better, rather than trying to pre-align things
+#allowed_types <- c("mRNA")
+#gtf2 <- gtf[gtf$type %in% allowed_types]
+gtf2 <- gtf
 
 df <- as.data.frame(gtf2)[,c("transcript_id","gene_id","gene_symbol","transcript_symbol")]
 

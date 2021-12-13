@@ -63,13 +63,9 @@ test dataset for each subworkflow, test mode is not guaranteed to complete the f
 ## Running the pipeline
 
 ```bash
-snakemake --profile <your profile> --use-singularity -j 999 -kp \
+snakemake --profile <your profile> --use-singularity --use-conda -j 999 -kp \
 	--config RUN_TYPE=FULL -n
 ```
 
 If disk space is at a premium, consider running with `--prioritize salmon_quant_se_vanilla `
 to enforce creation of the quant output and deletion of temp files for each sample as fast as possible.
-
-Additionally, batching may be used by specifying `--batch vanilla_salmon_terminus_collapse=1/N`
-where `N` is the total number of batches the collecting rule is divided into.
-This can then be repeated (`2/N` and so on) until all batches are run.
