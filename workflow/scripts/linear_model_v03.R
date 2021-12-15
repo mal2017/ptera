@@ -1,20 +1,19 @@
 library(tidyverse)
 library(tls)
 
-
 # -------- imort pairs for the chunk of lms to be evaluated --------
-#pairs_fl <- "results/linear_models/male_vst/chunk_0000"
+#pairs_fl <- "subworkflows/dgrp_coex/results/linear_models/male_vst_control_copy_and_overlap/chunk_0000"
 pairs_fl <- snakemake@input[["chunk"]]
 
 pairs <- vroom::vroom(pairs_fl,col_names = c("feature.y","feature.x")) #%>% head(10)
 
 # -------- prep data for the chunk of lms to be evaluated --------
 
-#dat_fl <- "results/linear_models/male_vst/expression.tsv.gz"
+#dat_fl <- "subworkflows/dgrp_coex/results/linear_models/male_vst_control_copy_and_overlap/expression.tsv.gz"
 dat_fl <- snakemake@input[["dat"]]
 dat <- vroom::vroom(dat_fl,num_threads = 1)
 
-#cd_fl <- "results/meta/metadata.csv"
+#cd_fl <- "subworkflows/dgrp_coex/results/meta/metadata.csv"
 cd_fl <-  snakemake@input[["cd"]]
 cd <- read_csv(cd_fl)
 
@@ -39,7 +38,7 @@ df <- df %>% left_join(ol, by = c("feature.y", "feature.x", "Strain")) %>%
 
 # ----------- add the copies annotation to the dataframe
 
-#copies_fl <- "subworkflows/wgs/results/copies/copies.tsv"
+#TEST: copies_fl <- "subworkflows/dgrp_wgs/results/copies/copies.tsv"
 copies_fl <- snakemake@input[["copies"]]
 
 copies <- read_tsv(copies_fl) %>%
@@ -47,7 +46,7 @@ copies <- read_tsv(copies_fl) %>%
   mutate(scaled.copies = scale(est.copies)[,1]) %>%
   ungroup()
 
-# join estimated copies and set to 1 where no info is available
+# join estimated copies and set to 1 where no info is available, (0 for scaled)
 df <- df %>%
   left_join(copies, by=c(Strain="Strain",feature.x="sequence")) %>%
   left_join(copies, by=c(Strain="Strain",feature.y="sequence")) %>%
@@ -59,8 +58,14 @@ df <- df %>%
 # rename these variables so the config can be more succinct
 df <- df %>% dplyr::rename(x="score.x", y="score.y")
 
-# formula <- as.formula("y ~ x + wolbachia + overlap + scaled.copies.x + scaled.copies.y")
-formula <- as.formula(snakemake@params[["formula"]])
+# main formula
+# TESTING: formula <- "y ~ 0 + x + wolbachia + scaled.copies.y + overlap"
+formula <- snakemake@params[["formula"]]
+
+# alternate formula; mainly relevant when using the overlap term, which is frequently all F for any
+# given TE/gene pair.
+# TESTING: alt_formula <- "y ~ 0 + x + wolbachia + scaled.copies.y"
+alt_formula <- snakemake@params[["alt_formula"]]
 
 # custom function for tidying tls::tls fit objs.
 tidy2 <-  function(x) {
@@ -70,23 +75,15 @@ tidy2 <-  function(x) {
               by="term")
 }
 
+# apply tls and tidy the results. alternate formula is possible because overlaps are often all False, leading to
+# tls error. This allows us to pull out all situations where overlap strongly correlates to paired expression.
 res <- df %>%
   nest(-c(feature.x,feature.y)) %>%
-  mutate(fit=map(data,~tls::tls(formula, data = ., method = "normal"))) %>%
-  #dplyr::select(-data) %>%
+  mutate(fit=map(data,~tls::tls(as.formula(if_else(length(unique(.$overlap))==1,alt_formula, formula)), data = ., method = "normal"))) %>%
   mutate(tidy = map(fit,tidy2))
 
-rm(df); rm(dat)
-
 # ------------------- export ------------------------------------------
-#tidy_fl <- "results/linear_models/male_edaseq_qn/chunk_0000.tidy.tsv"
-#glance_fl <- "results/linear_models/male_edaseq_qn/chunk_0000.glance.tsv"
-
 tidy_fl <- snakemake@output[["tidy"]]
-#glance_fl <- snakemake@output[["glance"]]
-#fits_fl <- snakemake@output[["fits"]]
-#aug_fl <- snakemake@output[["aug"]]
-
 
 res %>% dplyr::select(feature.x, feature.y, tidy) %>%
   unnest(tidy) %>%

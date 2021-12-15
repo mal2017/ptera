@@ -54,6 +54,7 @@ rule chunked_linear_model:
         #fits = temp("results/linear_models/{model_id}/fits/chunk_{lmchunk}.fits.rds")
     params:
         formula = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FORMULA"),
+        alt_formula = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_ALT_FORMULA"),
     conda:
         "../envs/tls_linmod_v1.yaml"
     resources:
