@@ -25,35 +25,17 @@ rule scatter_genes_for_lm:
     https://www.unix.com/shell-programming-and-scripting/247089-creating-all-possible-bi-combinations-list-grep-awk.html
     """
     input:
-        rules.filter_transform_scale.output.mat
+        expression = rules.filter_transform_scale.output.mat
     output:
-        temp(expand("results/linear_models/{{model_id}}/chunk_{ch}",ch=[str(x).zfill(4) for x in range(0,config.get("LM_CHUNKS",80))]))
+        temp(expand("results/linear_models/{{model_id}}/chunk_{ch}",ch=[str(x).zfill(4) for x in range(0,config.get("LM_CHUNKS"))]))
     params:
-        chunks = config.get("LM_CHUNKS"),
-        prefix = lambda wc: "results/linear_models/{model_id}/chunk_".format(model_id=wc.model_id)
+        split_invoc = "split -e -d -a 4 -n r/{ch} - results/linear_models/{{model_id}}/chunk_".format(ch= config.get("LM_CHUNKS"),)
     resources:
         time=240,
         mem=48000,
         cpus=1
-    shell:
-        """
-        awk '
-        {{
-                A[++c] = $1
-        }}
-        END {{
-                for ( i = 1; i <= c; i++ )
-                {{
-                        for ( j = i+1; j <= c; j++ )
-                        {{
-                                print A[j], A[i]
-                        }}
-                }}
-        }}
-        ' <(zcat {input} | cut -f 1 | tail -n+2) | \
-            split -e -d -a 4 \
-            -n r/{params.chunks} - {params.prefix}
-        """
+    script:
+        "../scripts/get_all_combos_tes_as_y.R"
 
 rule chunked_linear_model:
     """
