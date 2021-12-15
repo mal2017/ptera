@@ -2,14 +2,14 @@ library(tidyverse)
 library(tls)
 
 # -------- imort pairs for the chunk of lms to be evaluated --------
-#pairs_fl <- "subworkflows/dgrp_coex/results/linear_models/male_vst_control_copy_and_overlap/chunk_0000"
+#pairs_fl <- "subworkflows/dgrp_coex/results/linear_models/female_model_01/chunk_0080"
 pairs_fl <- snakemake@input[["chunk"]]
 
 pairs <- vroom::vroom(pairs_fl,col_names = c("feature.y","feature.x")) #%>% head(10)
 
 # -------- prep data for the chunk of lms to be evaluated --------
 
-#dat_fl <- "subworkflows/dgrp_coex/results/linear_models/male_vst_control_copy_and_overlap/expression.tsv.gz"
+#dat_fl <- "subworkflows/dgrp_coex/results/linear_models/female_model_01/expression.tsv.gz"
 dat_fl <- snakemake@input[["dat"]]
 dat <- vroom::vroom(dat_fl,num_threads = 1)
 
@@ -19,6 +19,7 @@ cd <- read_csv(cd_fl)
 
 dat <- pivot_longer(dat,-feature,names_to = "sample",values_to = "score")
 
+# ----------- join with metadata and pairs to create working dataframe -----------
 df <- left_join(pairs,dat, by=c(feature.y="feature"))
 
 df <- left_join(df,dat, by=c(feature.x="feature",sample="sample"), suffix=c(".y",".x"))
@@ -52,6 +53,16 @@ df <- df %>%
   left_join(copies, by=c(Strain="Strain",feature.y="sequence")) %>%
   mutate_at(c("est.copies.y","est.copies.x"), replace_na, 1) %>%
   mutate_at(c("scaled.copies.x","scaled.copies.y"),replace_na,0)
+
+# ----------------remove outliers per feature by mads ----------------------
+#mads_filter <- 3
+mads_filter <- snakemake@params[["mads_filter"]]
+
+dat <- dat %>% 
+  group_by(feature) %>% 
+  mutate(mads = abs(score- median(score))/mad(score)) %>%
+  ungroup() %>%
+  filter(mads < mads_filter)
 
 # --------begin to evaluate the lms --------
 

@@ -49,17 +49,15 @@ rule chunked_linear_model:
         copies = wgs_wf("results/copies/copies.tsv") if config.get("INCL_COPY_ESTIMATION_IN_EXPORT") else rules.dummy_copies.output.feats
     output:
         tidy = temp("results/linear_models/{model_id}/chunk_{lmchunk}.tidy.tsv"),
-        #glance = temp("results/linear_models/{model_id}/chunk_{lmchunk}.glance.tsv"),
-        #aug = temp("results/linear_models/{model_id}/chunk_{lmchunk}.aug.tsv"),
-        #fits = temp("results/linear_models/{model_id}/fits/chunk_{lmchunk}.fits.rds")
     params:
         formula = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FORMULA"),
         alt_formula = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_ALT_FORMULA"),
+        mads_filter = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_MADS_FILTER"),
     conda:
         "../envs/tls_linmod_v1.yaml"
     resources:
-        time=120,
-        mem=128000,
+        time=20,
+        mem=10000,
         cpus=1
     script:
         "../scripts/linear_model_v03.R"
@@ -78,19 +76,3 @@ rule collect_chunked_linear_models:
         cpus=1
     shell:
         "xsv cat rows -d '\t' {input} | tr ',' '\t' | gzip -c > {output}"
-
-rule lm_coefs_to_symmetric_matrix:
-    """
-    A symmetric matrix was reconstructed from the pairwise LMs generated from the 'lower
-    triangle' of features.
-    """
-    input:
-        tidy = "results/linear_models/{model_id}/lm.tidy.tsv.gz"
-    output:
-        tsv="results/linear_models/{model_id}/coefs.mat.tsv.gz"
-    resources:
-        time=480,
-        mem=128000,
-        cpus=1
-    script:
-        "../scripts/lm_coefs_to_symmetric_matrix.R"
