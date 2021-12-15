@@ -36,6 +36,7 @@ LM_FEATURE_FILT: "(((!str_detect(rownames(x),'FBgn')) & rowSums(x > 1) > 10) | (
 # LM_FIT_FOR_FEATURE_LEVEL: "gene" or "transcript." Transcript option not tested.
 # LM_FIT_FOR_UNITS: one of EXPORT_UNITS above
 # LM_CNNORM: [per_feature, per_est_copy]. Normalize expression for estimated copies. This is applied to TEs only. Per_feature == no correction.
+# LM_MADS_FILTER: Datapoints > N MADs above the data center are removed.
 # LM_FORMULA: Covariate options include wolbachia, overlap, scaled.copies.y/x, est.copies.y/x, length.y/x, sex, age.
 # LM_ALT_FORMULA: Overlaps are sparse and often lead to singular values. Alternate formula can be used to exclude 'overlap' as cov.
 # LM_SEX: male, female, or both
@@ -48,6 +49,7 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_FEATURE_LEVEL: "gene"
     LM_FIT_FOR_UNITS: vst
     LM_CNNORM: per_feature
+    LM_MADS_FILTER: 3
     LM_FORMULA: y ~ 0 + wolbachia + overlap + scaled.copies.y + x
     LM_ALT_FORMULA: y ~ 0 + wolbachia + scaled.copies.y + x
     LM_SEX: male
@@ -59,6 +61,7 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_FEATURE_LEVEL: "gene"
     LM_FIT_FOR_UNITS: vst
     LM_CNNORM: per_feature
+    LM_MADS_FILTER: 3
     LM_FORMULA: y ~ 0 + wolbachia + overlap + scaled.copies.y + x
     LM_ALT_FORMULA: y ~ 0 + wolbachia + scaled.copies.y + x
     LM_SEX: female
