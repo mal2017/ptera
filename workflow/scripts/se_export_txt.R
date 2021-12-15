@@ -1,6 +1,8 @@
 library(SummarizedExperiment)
 library(tidyverse)
 
+set.seed(1)
+
 #sex <- "male"
 sex <- snakemake@wildcards[["sex"]]
 sex <- unlist(ifelse(sex == "both",list(c("male","female")),sex))

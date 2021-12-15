@@ -1,5 +1,7 @@
 library(DESeq2)
 
+set.seed(1)
+
 #dds_fl <- "results/quantification/vanilla_salmon_tes_transcripts/salmon_dds.rds"
 dds_fl <- snakemake@input[["dds"]]
 

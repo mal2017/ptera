@@ -2,6 +2,8 @@ library(tidyverse)
 library(SummarizedExperiment)
 library(rlang)
 
+set.seed(1)
+
 #sefile <- "results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds"
 sefile <- snakemake@input[["sefile"]]
 se <- read_rds(sefile)
