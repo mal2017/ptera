@@ -63,7 +63,7 @@ test dataset for each subworkflow, test mode is not guaranteed to complete the f
 ## Running the pipeline
 
 ```bash
-snakemake --profile <your profile> --use-singularity --use-conda -j 999 -kp \
+snakemake --profile <your profile> --use-conda --use-singularity --use-conda -j 999 -kp \
 	--config RUN_TYPE=FULL -n
 ```
 
