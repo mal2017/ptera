@@ -16,6 +16,6 @@ subworkflow refs_wf:
 
 rule all:
     input:
-        expand("results/alevin-fry/seur_objs/{s}.usa.seur.rds",s=SAMPLES)
+        expand("results/alevin-fry/sce_objs/{s}.usa.sce.rds",s=SAMPLES)
 
 include: "rules/alevin-fry.smk"

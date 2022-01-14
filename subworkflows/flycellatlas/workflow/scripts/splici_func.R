@@ -146,7 +146,7 @@ make_splici_txome <- function(gtf_path,
   df <- getTx2Gene(grl)
   write.table(df, out_t2g, sep = "\t", row.names = FALSE, quote = FALSE, col.names = FALSE)
   df <- df %>%
-    dplyr::mutate(gene_id = word(gene_id, 1, sep = '-'),
+    dplyr::mutate(gene_id = ifelse(str_detect(gene_id, "FBgn"),word(gene_id, 1, sep = '-'),gene_id),
                   status = ifelse(str_detect(transcript_id, '-') & str_detect(gene_id, "FBgn"), 'U', 'S'))
   # THIS WAS EDITED BY ML BECAUSE IT WAS KILLING TES WITH -'s in the name
   
