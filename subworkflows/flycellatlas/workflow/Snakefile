@@ -1,0 +1,21 @@
+import sys
+import peppy
+import glob
+
+configfile: "../../config/config.yaml"
+#configfile: "config/config.yaml"
+pepfile: config.get("PEP")
+
+SAMPLES = [x.sample_name for x in pep.samples][0]
+
+subworkflow refs_wf:
+    workdir:
+        "../../references/"
+    snakefile:
+        "../../references/workflow/Snakefile"
+
+rule all:
+    input:
+        expand("results/alevin-fry/seur_objs/{s}.usa.seur.rds",s=SAMPLES)
+
+include: "rules/alevin-fry.smk"
