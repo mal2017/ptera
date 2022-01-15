@@ -1,7 +1,7 @@
 library(tidyverse)
 library(SingleCellExperiment)
 library(Seurat)
-library(tximport)
+library(zellkonverter)
 
 source("workflow/scripts/import_alevin_fry_func.R")
 
@@ -16,8 +16,9 @@ u <- load_fry(frydir =frydir, which_counts = "U") # load unspliced
 
 assay(x,"unspliced") <- counts(u) # combined into 1 sce
 
-sds <- CreateSeuratObject(counts = counts(x),assay = "spliced",project = proj) # make initial seur obj
-sds[["unspliced"]] <- CreateAssayObject(assay(x,"unspliced")) # add unspliced
+#sds <- CreateSeuratObject(counts = counts(x),assay = "spliced",project = proj) # make initial seur obj
+#sds[["unspliced"]] <- CreateAssayObject(assay(x,"unspliced")) # add unspliced
 
 write_rds(x,snakemake@output[["sce"]])
-write_rds(sds,snakemake@output[["seur"]])
+#write_rds(sds,snakemake@output[["seur"]])
+#zellkonverter::writeH5AD(sce = x,file = snakemake@output[["h5ad"]])

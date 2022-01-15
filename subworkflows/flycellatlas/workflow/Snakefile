@@ -6,7 +6,7 @@ configfile: "../../config/config.yaml"
 #configfile: "config/config.yaml"
 pepfile: config.get("PEP")
 
-SAMPLES = [x.sample_name for x in pep.samples][0]
+SAMPLES = [x.sample_name for x in pep.samples]
 
 subworkflow refs_wf:
     workdir:
@@ -16,6 +16,8 @@ subworkflow refs_wf:
 
 rule all:
     input:
-        expand("results/alevin-fry/sce_objs/{s}.usa.sce.rds",s=SAMPLES)
+        #expand("results/downstream/single_sample_dimred/{s}.usa.filt.dimred.sce.rds",s=SAMPLES),
+        expand("results/downstream/integrated_by_tissue_and_sex/{t_s}.sce.rds",t_s=[["head_female","head_male","ovary_female","testis_male"][i] for i in [0]])
 
 include: "rules/alevin-fry.smk"
+include: "rules/initial_scrna_steps.smk"

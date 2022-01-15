@@ -5,11 +5,11 @@
 Using mamba 0.9.2 (or conda 4.8.4) install the following:
 
 ```bash
-mamba create -n ptera_v1 \
+mamba create -n ptera_v2 \
 	python=3.9.6 snakemake=6.7.0 peppy=0.31.1 sra-tools=2.11.0 tabix=1.11 \
-	r-tidyverse=1.3.1 r-tidymodels=0.1.3 r-sparklyr=1.7.1 r-sqldf=0.4_11 \
-	xsv=0.13.0 bioconductor-deseq2=1.32.0 bioconductor-preprocesscore=1.54.0 \
-	bioconductor-edaseq=2.26.0 r-wgcna=1.69 samtools=1.14 bioconductor-macsr=1.2.0
+	r-tidyverse=1.3.1 r-tidymodels=0.1.3 r-sqldf=0.4_11 \
+	xsv=0.13.0 bioconductor-deseq2=1.34.0 bioconductor-preprocesscore=1.54.0 \
+	bioconductor-edaseq=2.26.0 samtools=1.14
 ```
 
 Make sure you run pre-install the macs env 1 time via basilisk.

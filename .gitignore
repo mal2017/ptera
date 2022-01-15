@@ -7,3 +7,5 @@ resources/
 fasterq*/
 RM_*/
 .RepeatMaskerCache
+*pdf
+*png

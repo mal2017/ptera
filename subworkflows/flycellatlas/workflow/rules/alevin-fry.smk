@@ -166,12 +166,3 @@ rule alevin_fry_quant:
             --resolution cr-like \
             --use-mtx
         """
-
-rule make_r_objs:
-    input:
-        frydir = rules.alevin_fry_quant.output.dir
-    output:
-        sce = "results/alevin-fry/sce_objs/{sample}.usa.sce.rds",
-        seur = "results/alevin-fry/seur_objs/{sample}.usa.seur.rds",
-    script:
-        "../scripts/import_alevin_fry.R"
