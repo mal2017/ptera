@@ -31,8 +31,8 @@ subworkflow main_wf:
 
 rule all:
     input:
-        expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf",s=SAMPLES),
-        expand("results/linear_models/{m}/lm.{r}.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),r=["tidy"]),
+        #expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf",s=SAMPLES),
+        expand("results/linear_models/{m}/lm.tidy.corrected.tsv.gz",m=config.get("LM_MODELS_TO_FIT")),
         #expand("results/linear_models/{m}/coefs.mat.tsv.gz",m=config.get("LM_MODELS_TO_FIT")),
         #wgs_wf("results/copies/copies.tsv")
         #expand("results/linear_models/{lms}/lm.{r}.tsv.gz",lms=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),

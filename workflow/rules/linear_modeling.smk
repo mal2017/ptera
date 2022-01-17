@@ -76,3 +76,18 @@ rule collect_chunked_linear_models:
         cpus=1
     shell:
         "xsv cat rows -d '\t' {input} | tr ',' '\t' | gzip -c > {output}"
+
+rule correct_tls_lm_coefs:
+    input:
+        coefs = "results/linear_models/{model_id}/lm.tidy.tsv.gz",
+        expression = lambda wc: "results/quantification/{p}/{s}.{fl}.{c}.{u}.tsv.gz".format(p=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_PIPELINE"),s=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_SEX"),fl=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_FEATURE_LEVEL"), c=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_CNNORM"),u=config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FIT_FOR_UNITS")),
+    output:
+        tsv = "results/linear_models/{model_id}/lm.tidy.corrected.tsv.gz"
+    resources:
+        time=60,
+        mem=24000,
+        cpus=1
+    conda:
+        "../envs/correct_coefs.yaml"
+    script:
+        "../scripts/correct_lm_coefs.R"
