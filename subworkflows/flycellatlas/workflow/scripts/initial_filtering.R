@@ -13,14 +13,14 @@ source("../../workflow/scripts/ggplot_theme.R")
 
 set.seed(2)
 
-#sce_fl <- "results/alevin-fry/r_objs/FCA14_Female_head_adult_5dWT_Luo_sample5_S5.usa.sce.rds"
+sce_fl <- "results/downstream/raw_r_objs/FCA62_Female_ovary_adult_5dWT_Nystul_All_Nuclei_S63.usa.sce.rds"
 
 sce_fl <- snakemake@input[["sce"]]
 
 sce <- read_rds(sce_fl)
 
 # --------------------
-# light clustering reduces incidence of error messages later
+# light filtering reduces incidence of error messages later
 # --------------------
 
 # remove cells with 0 counts
@@ -28,6 +28,8 @@ sce <- sce[,colSums(counts(sce)) > 0]
 
 # remove unexpressed genes
 sce <- sce[rowMeans(counts(sce)) > 0,]
+
+print(sce)
 
 # --------------------
 # remove ambient contamination
@@ -42,6 +44,8 @@ counts(sce) <- round(decontXcounts(dcx.sce))
 # remove cells/genes with low counts after decontx
 sce <- sce[,colSums(counts(sce)) > 1]
 sce <- sce[rowSums(counts(sce)) > 3 & rowMeans(counts(sce)) > 0,]
+
+print(sce)
 
 # --------------------
 # doublet removal
@@ -73,6 +77,8 @@ g_doublet <- dat_doublet %>%
 # perform filt
 sce <- sce[,scdbf$scDblFinder.class == "singlet"]
 
+print(sce)
+
 # --------------------
 # get qc metric
 # --------------------
@@ -86,17 +92,21 @@ mito_genes <- mito_genes[mito_genes$gene_id %in% rownames(sce)]
 
 sce <- addPerCellQCMetrics(sce, subsets = list(mito=mito_genes$gene_id))
 
+print(sce)
+
 # --------------------
 # remove outliers + low info cells
 # --------------------
 
 # next bit is low total outlier filtering, via scuttle
-keep.umis <- !isOutlier(sce$sum,type = "both",log = T,nmads = 3)
-keep.genes <- !isOutlier(sce$detected,type = "both",log = T, nmads = 3)
+keep.umis <- !isOutlier(sce$sum,type = "lower",log = T,nmads = 3)
+keep.genes <- !isOutlier(sce$detected,type = "lower",log = T, nmads = 3)
 
 sce <- sce[,keep.umis & keep.genes]
 
-sce <- sce[,colSums(counts(sce)) > 500 & sce$detected > 200]
+#sce <- sce[,colSums(counts(sce)) > 500 & sce$detected > 200]
+
+print(sce)
 
 # ---------------------------
 #  remove mito reads
@@ -122,6 +132,7 @@ if (!no_mito_outliers) {
   sce <- filterCells(sce, model = model)  
 }
 
+print(sce)
 
 # --------------
 # more qc metrics

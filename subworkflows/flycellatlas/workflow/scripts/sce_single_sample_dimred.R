@@ -8,7 +8,7 @@ source("../../workflow/scripts/ggplot_theme.R")
 
 # see http://bioconductor.org/books/3.14/OSCA.advanced/
 
-#sce_fl <- "results/downstream/initial_filtering/FCA62_Female_ovary_adult_5dWT_Nystul_All_Nuclei_S58.usa.filt.sce.rds"
+#sce_fl <- "results/downstream/initial_filtering/FCA62_Female_ovary_adult_5dWT_Nystul_All_Nuclei_S57.usa.filt.sce.rds"
 
 sce_fl <- snakemake@input[["sce"]]
 
@@ -27,7 +27,7 @@ sce <- read_rds(sce_fl)
 counts(sce) <- as.matrix(counts(sce))
 logcounts(sce) <- as.matrix(logcounts(sce))
 
-dec <- modelGeneCV2(sce)
+dec <- modelGeneCV2(sce, max.iter=200,min.mean=0.01)
 
 fit <- metadata(dec)
 
@@ -48,8 +48,8 @@ dat_var <- tibble(feature = names(fit$cv2),
 g_var <- ggplot(dat_var, aes(mean,metric)) +
   geom_point() +
   geom_point(data = . %>% filter(feature %in% hvg),color="blue") +
-  #scale_y_log10() +
-  #scale_x_log10() +
+  scale_y_log10() +
+  scale_x_log10() +
   geom_line(aes(mean,trend),color="red") +
   #coord_cartesian(ylim=c(0.1,max(dat_var$var,na.rm = T)*1.1)) +
   theme(aspect.ratio = 0.5)

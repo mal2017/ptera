@@ -12,6 +12,8 @@ rule make_r_objs:
         cpus=2
     conda:
         "../envs/make_r_objs.yaml"
+    priority:
+        3
     script:
         "../scripts/import_alevin_fry.R"
 
@@ -36,6 +38,8 @@ rule initial_filtering:
         cpus=2
     conda:
         "../envs/osca.yaml"
+    priority:
+        3
     script:
         "../scripts/initial_filtering.R"
 
@@ -60,12 +64,40 @@ rule sce_single_sample_dimred:
         cpus=2
     conda:
         "../envs/osca.yaml"
+    priority:
+        3
     script:
         "../scripts/sce_single_sample_dimred.R"
 
+rule sce_single_sample_clustering:
+    input:
+        sce = rules.sce_single_sample_dimred.output.sce
+    output:
+        sce = "results/downstream/single_sample_clustering/{sample}.usa.filt.dimred.clust.sce.rds",
+        g_sil = "results/downstream/figs/gg/{sample}_sil.rds",
+        dat_sil = "results/downstream/figs/tsv/{sample}_sil.tsv",
+        png_sil ="results/downstream/figs/png/{sample}_sil.png",
+        g_umap = "results/downstream/figs/gg/{sample}_umap.rds",
+        dat_umap = "results/downstream/figs/tsv/{sample}_umap.tsv",
+        png_umap ="results/downstream/figs/png/{sample}_umap.png",
+        g_tsne = "results/downstream/figs/gg/{sample}_tsne.rds",
+        dat_tsne = "results/downstream/figs/tsv/{sample}_tsne.tsv",
+        png_tsne ="results/downstream/figs/png/{sample}_tsne.png",
+    resources:
+        time=20,
+        mem=20000,
+        cpus=2
+    conda:
+        "../envs/osca.yaml"
+    priority:
+        3
+    script:
+        "../scripts/sce_single_sample_clustering.R"
+
+
 rule sce_integrate_by_tissue_and_sex:
     input:
-        sces = lambda wc: expand("results/downstream/single_sample_dimred/{s}.usa.filt.dimred.sce.rds",s=[x.sample_name for x in pep.samples if (x.tissue == wc.tissue) and (x.sex == wc.sex) and (x.sample_name in SAMPLES)]),
+        sces = lambda wc: expand("results/downstream/single_sample_clustering/{s}.usa.filt.dimred.clust.sce.rds",s=[x.sample_name for x in pep.samples if (x.tissue == wc.tissue) and (x.sex == wc.sex) and (x.sample_name in SAMPLES)]),
         decs = lambda wc: expand("results/downstream/single_sample_dimred/{s}.usa.filt.dimred.dec.rds",s=[x.sample_name for x in pep.samples if (x.tissue == wc.tissue) and (x.sex == wc.sex) and (x.sample_name in SAMPLES)])
     output:
         sce = "results/downstream/integrated_by_tissue_and_sex/{tissue}_{sex}.sce.rds",
@@ -78,5 +110,47 @@ rule sce_integrate_by_tissue_and_sex:
         cpus=2
     conda:
         "../envs/osca.yaml"
+    priority:
+        4
     script:
         "../scripts/sce_integrate_by_tissue_and_sex.R"
+
+rule sce_integrated_clustering:
+    input:
+        sce = rules.sce_integrate_by_tissue_and_sex.output.sce
+    output:
+        sce = "results/downstream/integrated_by_tissue_and_sex_clustering/{tissue}_{sex}.sce.rds",
+        g_sil = "results/downstream/figs/gg/{tissue}_{sex}_sil.rds",
+        dat_sil = "results/downstream/figs/tsv/{tissue}_{sex}_sil.tsv",
+        png_sil ="results/downstream/figs/png/{tissue}_{sex}_sil.png",
+        g_tsne = "results/downstream/figs/gg/{tissue}_{sex}_tsne.rds",
+        dat_tsne = "results/downstream/figs/tsv/{tissue}_{sex}_tsne.tsv",
+        png_tsne ="results/downstream/figs/png/{tissue}_{sex}_tsne.png",
+    resources:
+        time=20,
+        mem=20000,
+        cpus=2
+    conda:
+        "../envs/osca.yaml"
+    priority:
+        3
+    script:
+        "../scripts/sce_integrated_clustering.R"
+
+
+rule sce_integrated_dge:
+    input:
+        sces = lambda wc: expand("results/downstream/single_sample_clustering/{s}.usa.filt.dimred.clust.sce.rds",s=[x.sample_name for x in pep.samples if (x.tissue == wc.tissue) and (x.sex == wc.sex) and (x.sample_name in SAMPLES)]),
+        merged = rules.sce_integrated_clustering.output.sce,
+    output:
+        tsv = "results/downstream/integrated_by_tissue_and_sex_dge/{tissue}_{sex}.dge.tsv.gz",
+    resources:
+        time=20,
+        mem=20000,
+        cpus=2
+    conda:
+        "../envs/osca.yaml"
+    priority:
+        3
+    script:
+        "../scripts/sce_integrated_deg.R"

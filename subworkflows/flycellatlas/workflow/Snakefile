@@ -17,7 +17,7 @@ subworkflow refs_wf:
 rule all:
     input:
         #expand("results/downstream/single_sample_dimred/{s}.usa.filt.dimred.sce.rds",s=SAMPLES),
-        expand("results/downstream/integrated_by_tissue_and_sex/{t_s}.sce.rds",t_s=[["head_female","head_male","ovary_female","testis_male"][i] for i in [0]])
+        expand("results/downstream/integrated_by_tissue_and_sex_dge/{t_s}.dge.tsv.gz",t_s=[["head_female","head_male","ovary_female","testis_male"][i] for i in [0]])
 
 include: "rules/alevin-fry.smk"
 include: "rules/initial_scrna_steps.smk"
