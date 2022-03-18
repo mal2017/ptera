@@ -16,6 +16,7 @@ rule copy_bwa_mem2_indices_to_mount:
         gzi = "results/indices/bwa_mem2/ref.fasta.gz.gzi",
     params:
         idx = "results/indices/bwa_mem2"
+    priority: 2
     shell:
         """
         mkdir -p {params.idx} &&

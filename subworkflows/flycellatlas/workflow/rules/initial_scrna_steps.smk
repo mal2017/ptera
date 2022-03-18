@@ -33,8 +33,8 @@ rule initial_filtering:
         png_doublet ="results/downstream/figs/png/{sample}_doublets.png",
         png_miqc ="results/downstream/figs/png/{sample}_mito.png",
     resources:
-        time=10,
-        mem=20000,
+        time=240,
+        mem=48000,
         cpus=2
     conda:
         "../envs/osca.yaml"
@@ -145,8 +145,8 @@ rule sce_integrated_dge:
     output:
         tsv = "results/downstream/integrated_by_tissue_and_sex_dge/{tissue}_{sex}.dge.tsv.gz",
     resources:
-        time=20,
-        mem=20000,
+        time=60,
+        mem=64000,
         cpus=2
     conda:
         "../envs/osca.yaml"

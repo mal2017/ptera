@@ -10,12 +10,12 @@ source("../../workflow/scripts/ggplot_theme.R")
 # ---------------------------
 # get clusts
 # ---------------------------
-#merged_fl <- sce_fl <- "results/downstream/integrated_by_tissue_and_sex_clustering/head_female.sce.rds"
+#merged_fl <- sce_fl <- "results/downstream/integrated_by_tissue_and_sex_clustering/ovary_female.sce.rds"
 merged_fl <- snakemake@input[["merged"]]
 
 merged <- readRDS(merged_fl)
 
-#sce_fls <- Sys.glob("results/downstream/single_sample_clustering/*emale*ead*.sce.rds")
+#sce_fls <- Sys.glob("results/downstream/single_sample_clustering/*Female*ovary*usa.filt.dimred.clust.sce.rds")
 sce_fls <- snakemake@input[["sces"]]
 
 names(sce_fls) <- str_extract(sce_fls,"(?<=clustering\\/).+(?=\\.usa)")
@@ -33,6 +33,7 @@ all.sce2 <- lapply(sces, "[", i=universe,)
 
 all.sce2 <- lapply(all.sce2, function(x) {
   reducedDims(x) <- reducedDims(x)["PCA"]
+  reducedDims(x) <- NULL
   x
 })
 
@@ -42,9 +43,14 @@ all.sce2 <- lapply(all.sce2, function(x) {
   x
 })
 
+all.sce2 <- lapply(all.sce2, function(x) {
+  colData(x) <- colData(x)[,1,drop=F]
+  x
+})
+
 combined <- do.call(cbind, all.sce2)
 
-combined$batch <- rep(names(all.sce2), vapply(all.sce2, ncol, 0L))
+# combined$batch <- rep(names(all.sce2), vapply(all.sce2, ncol, 0L))
 
 clusters.mnn <- colLabels(merged)
 
@@ -54,19 +60,19 @@ rm(merged)
 
 # ---------------------------------
 # see combineMarkers()
-# 
+#
 # The pval.type="some" setting serves as a compromise between "all" and "any".
-# A combined p-value is calculated by taking the middlemost value of the Holm-corrected p-values for each gene. 
+# A combined p-value is calculated by taking the middlemost value of the Holm-corrected p-values for each gene.
 # (By default, this the median for odd numbers of contrasts and one-after-the-median for even numbers,
-# but the exact proportion can be changed by setting min.prop - see ?combineParallelPValues.) 
+# but the exact proportion can be changed by setting min.prop - see ?combineParallelPValues.)
 # Here, the null hypothesis is that the gene is not DE in at least half of the contrasts.
-# Genes are then ranked by the combined p-value. 
-# The aim is to provide a more focused marker set without being overly stringent, 
-# though obviously it loses the theoretical guarantees of the more extreme settings. 
-# For example, there is no guarantee that the top set contains genes that can distinguish a cluster from any other cluster, 
+# Genes are then ranked by the combined p-value.
+# The aim is to provide a more focused marker set without being overly stringent,
+# though obviously it loses the theoretical guarantees of the more extreme settings.
+# For example, there is no guarantee that the top set contains genes that can distinguish a cluster from any other cluster,
 # which would have been possible with pval.type="any".
-# For each gene and cluster, the summary effect size is defined as 
-# the effect size from the pairwise comparison with the min.prop-smallest p-value. 
+# For each gene and cluster, the summary effect size is defined as
+# the effect size from the pairwise comparison with the min.prop-smallest p-value.
 # This mirrors the p-value calculation but, again, is reported only for the benefit of the user.
 
 # this means, by my unserstanding, that the effect size is from the smallesst p value
@@ -86,6 +92,3 @@ diffs_tbl_list <- m.out %>% as.list() %>%
 diffs_tbl <- diffs_tbl_list %>% map_df(select,feature:summary.logFC,.id = "label")
 
 write_tsv(diffs_tbl, snakemake@output[["tsv"]])
-
-
-

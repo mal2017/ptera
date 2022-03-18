@@ -11,7 +11,7 @@ source("../../workflow/scripts/ggplot_theme.R")
 #  Get previously calculated HVG results
 # -----------------------------
 
-#dec_fls <- Sys.glob("results/downstream/single_sample_dimred/*emale*ead*.dec.rds")
+#dec_fls <- Sys.glob("results/downstream/single_sample_dimred/*Male*testis*.dec.rds")
 dec_fls <- snakemake@input[["decs"]]
 
 names(dec_fls) <- str_extract(dec_fls,"(?<=dimred\\/).+(?=\\.usa)")
@@ -22,11 +22,11 @@ decs <- dec_fls %>% map(read_rds)
 #  Get the SCE opjects for each batch
 # -----------------------------
 
-#sce_fls <- Sys.glob("results/downstream/single_sample_clustering/*emale*ead*.sce.rds")
+#sce_fls <- Sys.glob("results/downstream/single_sample_clustering/*Male*testis*.sce.rds")
 sce_fls <- snakemake@input[["sces"]]
 
 names(sce_fls) <- str_extract(sce_fls,"(?<=clustering\\/).+(?=\\.usa)")
-            
+
 sces <- sce_fls %>% map(read_rds)
 
 # -----------------------------
@@ -48,8 +48,8 @@ sces <- sce_fls %>% map(read_rds)
 # -----------------------------
 
 # currently, correction is
-corrected <- quickCorrect(sces, 
-                          precomputed = decs, 
+corrected <- quickCorrect(sces,
+                          precomputed = decs,
                           hvg.args = list(var.field="ratio"), # for use with cv2
                           PARAM=FastMnnParam(BSPARAM=BiocSingular::RandomParam()))
 

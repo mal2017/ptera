@@ -13,7 +13,7 @@ source("../../workflow/scripts/ggplot_theme.R")
 
 set.seed(2)
 
-sce_fl <- "results/downstream/raw_r_objs/FCA62_Female_ovary_adult_5dWT_Nystul_All_Nuclei_S63.usa.sce.rds"
+#sce_fl <- "results/downstream/raw_r_objs/FCA62_Female_ovary_adult_5dWT_Nystul_All_Nuclei_S63.usa.sce.rds"
 
 sce_fl <- snakemake@input[["sce"]]
 
@@ -53,7 +53,7 @@ print(sce)
 
 # get size factors by deconv method - see http://bioconductor.org/books/3.14/OSCA.basic/normalization.html#normalization-transformation
 set.seed(2)
-clust.sce <- scran::quickCluster(sce) 
+clust.sce <- scran::quickCluster(sce)
 sce <- computeSumFactors(sce, cluster=clust.sce, min.mean=0.1)
 
 # get logcounts
@@ -129,7 +129,7 @@ g_miqc <- ggplot(dat_miqc,aes(sum,subsets_mito_percent)) +
   geom_point()
 
 if (!no_mito_outliers) {
-  sce <- filterCells(sce, model = model)  
+  sce <- filterCells(sce, model = model)
 }
 
 print(sce)

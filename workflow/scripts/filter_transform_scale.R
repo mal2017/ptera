@@ -4,7 +4,7 @@ library(rlang)
 
 set.seed(1)
 
-#sefile <- "results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds"
+#sefile <- "subworkflows/dgrp_coex/results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds"
 sefile <- snakemake@input[["sefile"]]
 se <- read_rds(sefile)
 
@@ -17,7 +17,7 @@ features_2_use <-  rownames(x[eval(filt),])
 
 rm(x); #rm(se)
 
-#matfile <- "results/quantification/vanilla_salmon_tes_transcripts/male.gene.vst.tsv.gz"
+#matfile <- "subworkflows/dgrp_coex/results/quantification/vanilla_salmon_tes_transcripts/female.gene.per_feature.vst.tsv.gz"
 matfile <- snakemake@input[["mat"]]
 x <- vroom::vroom(matfile,num_threads = 1)
 
@@ -26,7 +26,7 @@ x <- column_to_rownames(x, "feature")[features_2_use,]
 
 
 # --------------------- perform transforms ---------------------------
-#transforms <- "log2(x+1)"
+#transforms <- "x"
 transforms <- snakemake@params[["transforms"]]
 transforms <- parse_expr(transforms)
 

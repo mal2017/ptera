@@ -7,16 +7,24 @@ source("../../workflow/scripts/ggplot_theme.R")
 
 # see http://bioconductor.org/books/3.14/OSCA.advanced/
 
-#sce_fl <- "results/downstream/single_sample_dimred/FCA7_Female_Adult_Head1_S4.usa.filt.dimred.sce.rds"
+sce_fl <- "results/downstream/single_sample_dimred/FCA62_Female_ovary_adult_5dWT_Nystul_All_Nuclei_S62.usa.filt.dimred.sce.rds"
 
 sce_fl <- snakemake@input[["sce"]]
 
 sce <- read_rds(sce_fl)
 
-set.seed(2)
-sce <- runTSNE(sce,dimred="PCA.elbow")
-set.seed(2)
-sce <- runUMAP(sce,dimred="PCA.elbow")
+if (ncol(sce) <= 10) {
+  message("very few cells!")
+  set.seed(2)
+  sce <- runTSNE(sce,dimred="PCA.elbow",perplexity=1)
+  set.seed(2)
+  sce <- runUMAP(sce,dimred="PCA.elbow",n_neighbors=2)  
+} else {
+  set.seed(2)
+  sce <- runTSNE(sce,dimred="PCA.elbow")
+  set.seed(2)
+  sce <- runUMAP(sce,dimred="PCA.elbow")  
+}
 
 # ------------------------
 # Clustering options

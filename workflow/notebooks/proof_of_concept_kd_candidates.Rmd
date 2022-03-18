@@ -1,0 +1,280 @@
+---
+title: "Find best candidates for initial KD"
+author: "Matt Lawlor"
+date: "1/17/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+# get interesting te-correlated genes
+
+Here I take the results from male and female TLS LM results after correction.
+
+```{r}
+coefs <- bind_rows(female = read_tsv("subworkflows/dgrp_coex/results/linear_models/female_model_01/lm.tidy.corrected.tsv.gz"),
+                   male = read_tsv("subworkflows/dgrp_coex/results/linear_models/male_model_01/lm.tidy.corrected.tsv.gz"),.id = "sex")
+
+```
+
+Here I get the universe of potentially interesting genes.
+
+```{r}
+# AnimalTFdb 3.0
+tfs <- read_tsv("resources/Drosophila_melanogaster_TF.txt")
+cofacs <- read_tsv("resources/Drosophila_melanogaster_TF_cofactors.txt")
+
+
+tfoi <- bind_rows(tfs,cofacs) %>%
+  dplyr::select(symbol=Symbol, feature.x = Ensembl,family = Family) %>%
+  distinct()
+
+symbol_lookup <- read_tsv("http://ftp.flybase.net/releases/current/precomputed_files/genes/fbgn_annotation_ID.tsv.gz", skip=3) %>%
+  rename(symbol = "##gene_symbol", feature.x = "primary_FBgn#") %>%
+  dplyr::select(symbol,feature.x)
+
+coefs.oi <- filter(coefs, term == "x" & significant) %>%
+  inner_join(symbol_lookup, by=c("feature.x"))
+```
+
+# filtering by dge in scrna
+
+Now I want to filter the above list by DGE results. THis will take some processing. First filter for significant LFCs above a
+relatively low threshold.
+
+```{r}
+dge <- list(head_female = "subworkflows/flycellatlas/results/downstream/integrated_by_tissue_and_sex_dge/head_female.dge.tsv.gz",
+            head_male = "subworkflows/flycellatlas/results/downstream/integrated_by_tissue_and_sex_dge/head_male.dge.tsv.gz") %>%
+  map_df(read_tsv,.id="dataset")
+
+dge <- dge %>% filter(FDR < 0.1 & abs(summary.logFC) > 0.5)
+```
+
+I reason that the easiest, quickest filter will be to find genes that are up/downregulated in
+clusters with TE up/downregulation.  I will do this by first identifying clusters that
+seem highly amenable to TE expression or are highly repressive.
+
+```{r}
+top_groups <- dge %>% filter(!str_detect(feature,"FBgn")) %>%
+  group_by(dataset,label, direction = ifelse(sign(summary.logFC)==1,"upregulated","downregulated")) %>%
+  tally() %>%
+  ungroup() %>%
+  pivot_wider(names_from = direction,values_from = n) %>%
+  replace_na(replace = list(upregulated=0,downregulated=0)) %>%
+  mutate(ratio=log2((upregulated + 1)/(downregulated+1)))
+```
+
+We can visualize these groups here. I will only take the top few from each.
+
+```{r}
+plot_top_groups <- function(x) {
+  mutate_at(x,"label",as.factor) %>%
+  mutate(label = fct_reorder(label,ratio)) %>%
+  mutate(ypos_dn = map_dbl(ratio,.f = function(x) {min(x + sign(x)*0.5,sign(x) * -0.5)})) %>%
+  mutate(ypos_up = map_dbl(ratio,.f = function(x) {max(x + sign(x)*0.5,sign(x) * -0.5)})) %>%
+    mutate(label=fct_drop(label)) %>%
+  ggplot(aes(label,ratio)) +
+  geom_col() +
+  geom_text(aes(label, ypos_dn,label=downregulated), color="blue", size=rel(3)) +
+    geom_text(aes(label, ypos_up,label=upregulated), color="red", size=rel(3)) +
+  theme_classic() +
+  theme(aspect.ratio = 0.5, axis.text.x = element_text(size=rel(1.2))) +
+  facet_wrap(~dataset)  
+}
+
+
+top_groups %>% filter(dataset=="head_female") %>% plot_top_groups
+
+top_groups %>% filter(dataset=="head_male") %>% plot_top_groups
+```
+
+Here I select the datasets/labels which I presume will have valid pairs.
+
+```{r}
+labels_to_select_from <- top_groups %>%
+  group_by(dataset,enrichment = sign(ratio)) %>%
+  slice_max(abs(ratio),n=5) %>%
+  dplyr::select(dataset,label,enrichment) %>%
+  filter(enrichment!=0) %>%
+  ungroup()
+```
+
+Now is the slightly tricky data reshaping step - I want gene/te pairs
+that are in a group with clear propensity for repression/activation.
+
+I additionally filter to only include TEs that move in the overall direction of the group,
+so that 1 or 2 TEs that are for example downrgulated in a permissive group don't contribute.
+
+```{r}
+# get all types of relationship that we want to search for.
+intriguing_feature_sets0 <- dge %>%
+  inner_join(labels_to_select_from, by = c("dataset","label")) %>%
+  mutate(gene_direction = sign(summary.logFC)) %>%
+  dplyr::select(dataset,label,feature,enrichment, gene_direction) %>%
+  #filter(sign(summary.logFC)==enrichment) %>%
+  mutate(type = ifelse(str_detect(feature,"FBgn"),"gene","TE")) %>%
+  nest(-dataset,-label,-type,-enrichment,-gene_direction) %>%
+  filter(!(type=="TE" & enrichment != gene_direction))
+
+intriguing_feature_sets0
+```
+
+That last step means I need to add some TEs back.
+
+```{r}
+# now spread this, but replace the values for TEs.
+intriguing_feature_sets1 <- intriguing_feature_sets0 %>%
+  pivot_wider(names_from = type,values_from = data) %>%
+  group_by(dataset,label) %>%
+  mutate(TE = head(TE,1)) %>%
+  ungroup()
+
+intriguing_feature_sets1
+```
+
+Now I'll put the possible combinations into plain english.
+
+```{r}
+# get the relationships in plain english
+intriguing_feature_sets2 <- intriguing_feature_sets1  %>%
+    mutate(relationship_summary = case_when(enrichment == 1 & gene_direction == 1 ~ "pos",
+                                            enrichment == 1 & gene_direction == -1 ~ "neg",
+                                            enrichment == -1 & gene_direction == -1 ~ "pos",
+                                            enrichment == -1 & gene_direction == 1 ~ "neg"))
+
+intriguing_feature_sets2
+```
+
+
+```{r}
+intriguing_feature_sets3 <- intriguing_feature_sets2 %>%
+  mutate(features = map2(gene,TE, ~unlist(bind_rows(.x,.y)))) %>%
+  dplyr::select(dataset,label,features, enrichment, gene_direction, relationship_summary)
+```
+
+```{r}
+intriguing_feature_sets4 <- intriguing_feature_sets3 %>% unnest(features) %>% rename(feature = features)
+
+filtering_feature_set <- inner_join(intriguing_feature_sets4 %>% filter(str_detect(feature,"FBgn")),
+           intriguing_feature_sets4 %>% filter(!str_detect(feature,"FBgn")), by=c("dataset","label","enrichment","gene_direction","relationship_summary")) %>%
+  mutate(sex = ifelse(str_detect(dataset,"female"),"female","male"))
+```
+
+```{r}
+
+filtered_coefs <- coefs.oi %>%
+  inner_join(filtering_feature_set,by=c(sex ="sex",feature.x="feature.x",feature.y="feature.y",relationship="relationship_summary")) %>%
+  mutate(scrna_evidence = paste0(dataset,"_",label)) %>%
+  group_by(feature.x, feature.y,estimate.qnorm,relationship,sex) %>%
+  mutate(scrna_evidence = paste0(dataset,"_",scrna_evidence)) %>%
+  summarise(n_supporting_clusters = n(), scrna_evidence = paste(scrna_evidence,collapse = ","),.groups = "drop") %>%
+  distinct() %>%
+  group_by(feature.x,relationship) %>%
+  filter(n() > 3) %>%
+  group_by(feature.x) %>%
+  filter(length(unique(relationship))==1) %>%
+  ungroup() %>%
+  left_join(symbol_lookup)
+```
+
+```{r}
+filtered_coefs %>%
+  ggplot(aes(reorder(symbol,estimate.qnorm),estimate.qnorm)) +
+  geom_jitter(width = 0.1) +
+  geom_vline(xintercept = "pan") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle=45, hjust=1),aspect.ratio = 0.5) +
+  facet_wrap(sex~relationship,scales = "free")
+```
+
+Ranking
+
+```{r}
+top.overall <- coefs.oi %>%
+  group_by(sex, symbol) %>%
+  summarise(mean.relationship = mean(estimate.qnorm),
+            n.relationships=n()) %>%
+  mutate(relationship = ifelse(sign(mean.relationship)==1,"pos","neg")) %>%
+  group_by(sex,relationship) %>%
+  mutate(rnk.effect = percent_rank(abs(mean.relationship)), rnk.n = percent_rank(n.relationships)) %>%
+  ungroup()
+
+tls_ranking <- top.overall %>%
+  pivot_wider(names_from = sex, values_from = c(mean.relationship, n.relationships, relationship, rnk.n, rnk.effect)) %>%
+  drop_na() %>%
+  mutate(overall_score = rnk.n_male * rnk.n_female * rnk.effect_male * rnk.effect_female,
+         male_score = rnk.n_male * rnk.effect_male,
+         female_score = rnk.n_female * rnk.effect_female) %>%
+  arrange(-overall_score) %>%
+  relocate(overall_score,male_score,female_score,.after = symbol)
+```
+
+
+```{r}
+# from TLS notebook on box
+#tls_ranking <- read_tsv("~/Downloads/overall_ranking.tsv")
+
+plottable_ranking <- filtered_coefs %>%
+  group_by(symbol,relationship,sex) %>%
+  summarise(n_tes = n(),scrna_evidence = paste(scrna_evidence,collapse = ","),.groups = "drop") %>%
+  mutate(n_supporting_clusters = map_dbl(scrna_evidence,.f=function(x){length(unique(unlist(str_split(x,","))))})) %>%
+  left_join(tls_ranking) %>%
+  dplyr::select(symbol:female_score) %>%
+  mutate(usable_score = ifelse(sex == "female",female_score,male_score)) %>%
+  dplyr::select(-male_score,-female_score) %>%
+  filter(n_tes > 3 & n_supporting_clusters > 1)
+
+plottable_ranking %>%
+  filter(n_tes > 3 & n_supporting_clusters > 1) %>%
+  ggplot(aes(as_factor(n_tes),usable_score,label=symbol)) +
+  geom_point(aes(size=n_supporting_clusters)) +
+  facet_grid(. ~sex + relationship,scales = "free", space = "free") +
+  ggrepel::geom_label_repel() +
+  ylab("Rescaled Association Score") +
+  theme_linedraw() +
+  xlab("N supported TES")
+
+plottable_ranking %>%
+  filter(symbol%in% tfoi$symbol) %>%
+  filter(n_tes > 3 & n_supporting_clusters > 1) %>%
+  ggplot(aes(as_factor(n_tes),usable_score,label=symbol)) +
+  geom_point(aes(size=n_supporting_clusters)) +
+  facet_grid(. ~sex + relationship,scales = "free", space = "free") +
+  ggrepel::geom_label_repel() +
+  ylab("Rescaled Association Score") +
+  theme_linedraw() +
+  xlab("N supported TES")
+
+plottable_ranking %>%
+  filter(symbol%in% tfoi$symbol) %>%
+  filter(n_tes > 3 & n_supporting_clusters > 1) %>%
+  dplyr::select(symbol,n_tes,n_supporting_clusters,usable_score,sex) %>%
+  distinct() %>%
+  group_by(symbol) %>%
+  mutate(n_tes = mean(n_tes), n_supporting_clusters = mean(n_supporting_clusters)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = sex, values_from = c(usable_score), values_fill = 0) %>%
+  ggplot(aes(female,male,size=n_tes,color=n_supporting_clusters, label=symbol)) +
+  geom_point() +
+  theme_linedraw() +
+  ggrepel::geom_label_repel(size=rel(4))
+
+
+plottable_ranking %>%
+  dplyr::select(symbol,overall_score) %>%
+  distinct() %>%
+  arrange(-overall_score) %>%
+  pull(symbol) %>%
+  walk(message)
+```
+
+
+```{r}
+sessionInfo()
+```

@@ -23,11 +23,11 @@ subworkflow refs_wf:
     snakefile:
         "../../references/workflow/Snakefile"
 
-subworkflow main_wf:
-    workdir:
-        "../../../"
-    snakefile:
-        "../../../workflow/Snakefile"
+#subworkflow main_wf:
+#    workdir:
+#        "../../../"
+#    snakefile:
+#        "../../../workflow/Snakefile"
 
 rule all:
     input:
