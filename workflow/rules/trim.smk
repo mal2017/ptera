@@ -32,8 +32,8 @@ rule fastp_trim_pe:
     default parameters.
     """
     input:
-        r1=rules.concat_pe_runs.output.r1,
-        r2=rules.concat_pe_runs.output.r2,
+        r1="results/reads/concat/{sample}_r1.fastq",
+        r2="results/reads/concat/{sample}_r2.fastq"
     output:
         r1 = temp("results/reads/fastp-pe/{sample}_r1.trimmed.fq.gz"),
         r2 = temp("results/reads/fastp-pe/{sample}_r2.trimmed.fq.gz"),
