@@ -1,0 +1,27 @@
+import sys
+import peppy
+import glob
+
+configfile: "config/config.yaml"
+pepfile: "config/pep.yaml"
+
+SAMPLES = [x.sample_name for x in pep.samples]
+
+SUBSAMPLE_TABLE = pep.subsample_table
+
+subworkflow refs_wf:
+    workdir:
+        "../../references/"
+    snakefile:
+        "../../references/workflow/Snakefile"
+
+rule all:
+    input:
+        "results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds"
+
+
+include: "../../../workflow/rules/download.smk"
+include: "../../../workflow/rules/trim.smk"
+include: "../../../workflow/rules/utils.smk"
+include: "../../../workflow/rules/vanilla_salmon.smk"
+include: "../../../workflow/rules/metadata.smk"

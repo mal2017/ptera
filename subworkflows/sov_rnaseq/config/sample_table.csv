@@ -1,0 +1,25 @@
+sample_name,Genotype,Age,Developmental_Stage,fertility_phenotype
+GSM3127607,w[*]/y[1] sc[*] v[1]; P{w[+mW.hs]=GAL4-da.G32}UH1/P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2,4-5 days post-eclosion,Adult,Fertile
+GSM3127610,w[*]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40; P{w[+mW.hs]=GAL4-da.G32}UH1,4-5 days post-eclosion,Adult,Sterile
+GSM3127611,w[*]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40; P{w[+mW.hs]=GAL4-da.G32}UH1,4-5 days post-eclosion,Adult,Sterile
+GSM3127645,"P{w[+mW.hs]=GawB}C587\, w[*]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2",4-5 days post-eclosion,Adult,Fertile
+GSM3127647,"P{w[+mW.hs]=GawB}C587\, w[*]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2",4-5 days post-eclosion,Adult,Fertile
+GSM3127649,"P{w[+mW.hs]=GawB}C587\, w[*]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40",4-5 days post-eclosion,Adult,Sterile
+GSM3127651,w[1118]/y[1] sc[*] v[1]; P{w[+mC]=GAL4::VP16-nos.UTR}CG6325[MVD1]/P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2,4-5 days post-eclosion,Adult,Fertile
+GSM3127653,w[1118]/y[1] sc[*] v[1]; P{w[+mC]=GAL4::VP16-nos.UTR}CG6325[MVD1]/P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2,4-5 days post-eclosion,Adult,Fertile
+GSM3127655,w[1118]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40; P{w[+mC]=GAL4::VP16-nos.UTR}CG6325[MVD1],4-5 days post-eclosion,Adult,Sterile
+GSM3127684,y[*] w[*]/y[1] sc[*] v[1]; P{ww[+mC]=GawB}NP1624; P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2,4-5 days post-eclosion,Adult,Fertile
+GSM3127686,y[*] w[*]/y[1] sc[*] v[1]; P{ww[+mC]=GawB}NP1624; P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2,4-5 days post-eclosion,Adult,Fertile
+GSM3127688,y[*] w[*]/y[1] sc[*] v[1]; P{ww[+mC]=GawB}NP1624/P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40,4-5 days post-eclosion,Adult,Sterile
+GSM3127606,w[*]/y[1] sc[*] v[1]; P{w[+mW.hs]=GAL4-da.G32}UH1/P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2,4-5 days post-eclosion,Adult,Fertile
+GSM3127608,w[*]/y[1] sc[*] v[1]; P{w[+mW.hs]=GAL4-da.G32}UH1/P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2,4-5 days post-eclosion,Adult,Fertile
+GSM3127609,w[*]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40; P{w[+mW.hs]=GAL4-da.G32}UH1,4-5 days post-eclosion,Adult,Sterile
+GSM3127646,"P{w[+mW.hs]=GawB}C587\, w[*]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2",4-5 days post-eclosion,Adult,Fertile
+GSM3127648,"P{w[+mW.hs]=GawB}C587\, w[*]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40",4-5 days post-eclosion,Adult,Sterile
+GSM3127650,"P{w[+mW.hs]=GawB}C587\, w[*]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40",4-5 days post-eclosion,Adult,Sterile
+GSM3127652,w[1118]/y[1] sc[*] v[1]; P{w[+mC]=GAL4::VP16-nos.UTR}CG6325[MVD1]/P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2,4-5 days post-eclosion,Adult,Fertile
+GSM3127654,w[1118]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40; P{w[+mC]=GAL4::VP16-nos.UTR}CG6325[MVD1],4-5 days post-eclosion,Adult,Sterile
+GSM3127656,w[1118]/y[1] sc[*] v[1]; P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40; P{w[+mC]=GAL4::VP16-nos.UTR}CG6325[MVD1],4-5 days post-eclosion,Adult,Sterile
+GSM3127685,y[*] w[*]/y[1] sc[*] v[1]; P{ww[+mC]=GawB}NP1624; P{y[+t7.7] v[+t1.8]=VALIUM20-mCherry}attP2,4-5 days post-eclosion,Adult,Fertile
+GSM3127687,y[*] w[*]/y[1] sc[*] v[1]; P{ww[+mC]=GawB}NP1624/P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40,4-5 days post-eclosion,Adult,Sterile
+GSM3127689,y[*] w[*]/y[1] sc[*] v[1]; P{ww[+mC]=GawB}NP1624/P{y[+t7.7] v[+t1.8]=TRiP.HMC04875}attP40,4-5 days post-eclosion,Adult,Sterile

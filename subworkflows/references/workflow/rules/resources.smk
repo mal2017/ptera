@@ -14,7 +14,7 @@ rule get_resources_in_mount:
         MISCRNA_FASTA = "../../" + config.get("MISCRNA_FASTA"),
         NCRNA_FASTA = "../../" + config.get("NCRNA_FASTA"),
         TRNA_FASTA = "../../" + config.get("TRNA_FASTA"),
-
+        GAL4_FASTA = "../../" + config.get("GAL4_FASTA"),
     output:
         CONSENSUS_TE_FASTA = "results/" + config.get("CONSENSUS_TE_FASTA"),
         GENOME_FASTA = "results/" + config.get("GENOME_FASTA"),
@@ -25,6 +25,7 @@ rule get_resources_in_mount:
         MISCRNA_FASTA = "results/" + config.get("MISCRNA_FASTA"),
         NCRNA_FASTA = "results/"+ config.get("NCRNA_FASTA"),
         TRNA_FASTA = "results/" + config.get("TRNA_FASTA"),
+        GAL4_FASTA = "results/" + config.get("GAL4_FASTA"),
     shell:
         """
         cp {input.CONSENSUS_TE_FASTA} {output.CONSENSUS_TE_FASTA}
@@ -36,4 +37,5 @@ rule get_resources_in_mount:
         cp {input.MISCRNA_FASTA} {output.MISCRNA_FASTA}
         cp {input.NCRNA_FASTA} {output.NCRNA_FASTA}
         cp {input.TRNA_FASTA} {output.TRNA_FASTA}
+        cp {input.GAL4_FASTA} {output.GAL4_FASTA}
         """

@@ -13,3 +13,5 @@ kd_mamo_rep1,a,PAIRED,kd_mamo_rep1,kd_mamo_rep1,R3/R3_CKDL220009335-1a_HHK5NBBXX
 kd_mamo_rep2,a,PAIRED,kd_mamo_rep2,kd_mamo_rep2,R4/R4_CKDL220009336-1a_HHK5NBBXX_L7_1.fq.gz,R4/R4_CKDL220009336-1a_HHK5NBBXX_L7_2.fq.gz
 kd_ct_rep1,a,PAIRED,kd_ct_rep1,kd_ct_rep1,R5/R5_CKDL220009337-1a_HHK5NBBXX_L7_1.fq.gz,R5/R5_CKDL220009337-1a_HHK5NBBXX_L7_2.fq.gz
 kd_ct_rep2,a,PAIRED,kd_ct_rep2,kd_ct_rep2,R6/R6_CKDL220009338-1a_HHK5NBBXX_L7_1.fq.gz,R6/R6_CKDL220009338-1a_HHK5NBBXX_L7_2.fq.gz
+kd_w_rep1,a,PAIRED,kd_w_rep1,kd_w_rep1,F1_cross3_1_S7_R1_001.fastq.gz,F1_cross3_1_S7_R2_001.fastq.gz
+kd_w_rep2,a,PAIRED,kd_w_rep2,kd_w_rep2,F1_cross3_2_S8_R1_001.fastq.gz,F1_cross3_2_S8_R2_001.fastq.gz

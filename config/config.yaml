@@ -17,6 +17,7 @@ TRNA_FASTA: resources/dmel-all-tRNA-r6.41.fasta.gz
 PSEUDOGENE_FASTA: resources/dmel-all-pseudogene-r6.41.fasta.gz
 GENOME_FASTA: resources/dmel-all-chromosome-r6.41.fasta.gz
 TRANSCRIPTOME_GTF: resources/dmel-all-r6.41.gtf
+GAL4_FASTA: resources/S288C_YPL248C_GAL4_coding.fasta.gz
 FLYBASE_RELEASE: FB2021_04
 GENOME_VERSION: r6.41
 

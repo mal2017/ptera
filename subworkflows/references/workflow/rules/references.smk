@@ -9,11 +9,12 @@ rule make_transcripts_and_consensus_tes_fasta:
         trna = "results/" + config.get("TRNA_FASTA"),
         ncrna = "results/" + config.get("NCRNA_FASTA"),
         miscrna = "results/" + config.get("MISCRNA_FASTA"),
+        gal4 = "results/" + config.get("GAL4_FASTA"),
     output:
         fa = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz",
         dummy_decoy = touch("results/references/transcripts_and_consensus_tes/dummy_decoy.txt")
     shell:
-        "cat {input.tes} {input.txs} {input.trna} {input.ncrna} {input.miscrna} > {output.fa}"
+        "cat {input.tes} {input.txs} {input.trna} {input.ncrna} {input.miscrna} {input.gal4} > {output.fa}"
 
 rule make_transcripts_and_consensus_tes_gtf:
     """
@@ -22,6 +23,7 @@ rule make_transcripts_and_consensus_tes_gtf:
     """
     input:
         te_fasta = "results/" + config.get("CONSENSUS_TE_FASTA"),
+        gal4_fasta = "results/" + config.get("GAL4_FASTA"),
         host_gtf = "results/" + config.get("TRANSCRIPTOME_GTF")
     output:
         gtf = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf",
