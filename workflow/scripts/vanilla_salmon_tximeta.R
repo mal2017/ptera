@@ -30,16 +30,16 @@ makeLinkedTxome(indexDir = indexDir, source = "Flybase + repeats",
                 gtf = tx_gtf,
                 genome = genome_version)
 
-# # remove cache
-# if (interactive()) {
-#   bfcloc <- getTximetaBFC()
-# } else {
-#   bfcloc <- tempdir()
-# }
-# bfc <- BiocFileCache(bfcloc)
-# bfcremove(bfc, bfcquery(bfc, "linkedTxomeTbl")$rid)
-#
-# loadLinkedTxome(jsonFile)
+# remove cache
+if (interactive()) {
+  bfcloc <- getTximetaBFC()
+} else {
+  bfcloc <- tempdir()
+}
+bfc <- BiocFileCache(bfcloc)
+bfcremove(bfc, bfcquery(bfc, "linkedTxomeTbl")$rid)
+
+loadLinkedTxome(jsonFile)
 
 # -----------------------------------------------------------------------------
 # make tximeta object
