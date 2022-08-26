@@ -20,7 +20,7 @@ SALMON_VANILLA_SOFTCLIP: TRUE
 # relevant as the input to DESeq2 but also because some normalizations are run
 # on these directly. So, that means those normalizations are run on totally raw
 # counts if the params below == "no"
-SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE: 'no' # no, scaledTPM, lengthScaledTPM
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE: 'scaledTPM' # no, scaledTPM, lengthScaledTPM
 SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TXOUT: 'no' # no, scaledTPM, lengthScaledTPM, dtuScaledTPM
 SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS: 'no' # no, scaledTPM, lengthScaledTPM
 

@@ -52,8 +52,8 @@ rule fastqc:
     output:
         directory("results/fastqc/")
     resources:
-        time=30,
-        mem=16000,
+        time=60,
+        mem=24000,
         cpus=24
     threads:
         24

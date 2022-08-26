@@ -9,5 +9,5 @@ sample_modifiers:
       sources:
         amarel_novo_r1: /projects/genetics/ellison_lab/data/illumina/RNAseq/novogene_20220425/usftp21.novogene.com/raw_data/{fq_r1}
         amarel_novo_r2: /projects/genetics/ellison_lab/data/illumina/RNAseq/novogene_20220425/usftp21.novogene.com/raw_data/{fq_r2}
-        amarel_old_r1: /projects/genetics/ellison_lab/data/illumina/RNAseq/total_RNA/{fq_r1}
-        amarel_old_r2: /projects/genetics/ellison_lab/data/illumina/RNAseq/total_RNA/{fq_r2}
+        amarel_novo2_r1: /projectsp/genetics/ellison_lab/matt/data/220809_tetf_kd-rnd2-batch1/01.RawData/{fq_r1}
+        amarel_novo2_r2: /projectsp/genetics/ellison_lab/matt/data/220809_tetf_kd-rnd2-batch1/01.RawData/{fq_r2}
