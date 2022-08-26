@@ -7,9 +7,11 @@ configfile: "config/config.yaml"
 pepfile: config.get("PEP")
 
 SAMPLES = [x.sample_name for x in pep.samples]
-SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:2]
+#SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:2]
 
 SUBSAMPLE_TABLE = pep.subsample_table
+
+ruleorder: concat_pe_runs > concat_runs > fasterq_dump
 
 subworkflow wgs_wf:
     workdir:

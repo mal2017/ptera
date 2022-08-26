@@ -11,6 +11,7 @@ sex <- unlist(ifelse(sex == "both",list(c("male","female")),sex))
 se_fl <- snakemake@input[["se"]]
 se <- readRDS(se_fl)
 se <- se[,se$sex %in% sex]
+se <- se[rownames(se)!="GAL4",]
 
 #ot <- "normcts" # "normcts" "vst" "rlog" "fpkm" "abundance"
 ot <- snakemake@wildcards[["expression_unit"]] # "normcts" "vst" "rlog" "fpkm" "abundance"

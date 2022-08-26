@@ -52,6 +52,7 @@ coefs.qtiles <- coefs.all %>%
 #  coord_cartesian(ylim=c(-75,75)) +
 #  theme(aspect.ratio = 1)
 
+message("finding reference pairs...")
 coefs.qtiles.refs <- coefs.qtiles %>%
   filter(abs(estimate) < 100) %>%
   filter(mean_qtile.gene %in% c(5,6)) %>%
@@ -59,10 +60,12 @@ coefs.qtiles.refs <- coefs.qtiles %>%
   summarise(ref = list(estimate)) %>%
   ungroup()
 
+message("setting up data for correction...")
 corrected0 <- coefs.qtiles %>%
   left_join(coefs.qtiles.refs) %>%
   group_by(mean_qtile.te, mean_qtile.gene, relationship)
 
+message("performing correction...")
 corrected <- mutate(corrected0, estimate.qnorm = normalize.quantiles.use.target(matrix(estimate,ncol = 1),ref[[1]])[,1]) %>% 
   ungroup()
 

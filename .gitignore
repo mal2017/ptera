@@ -9,3 +9,4 @@ RM_*/
 .RepeatMaskerCache
 *pdf
 *png
+.java
