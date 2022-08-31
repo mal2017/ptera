@@ -2,13 +2,15 @@ library(rtracklayer)
 
 tefafile <- snakemake@input[["te_fasta"]]
 #gal4fafile <- snakemake@input[["gal4_fasta"]]
+ERCCfafile <- snakemake@input[["ercc_fasta"]]
 # tefafile <- "../../resources/Tidalbase_transposon_sequence.fasta.gz" # tefafile <- "resources/dmel_repbase_lib.fasta.gz"
 gtffile <- snakemake@input[["host_gtf"]]
 # gtffile <- "resources/dmel-all-r6.41.gtf"
 
 # get te seqs
 #te_fa <-  c(import(tefafile),import(gal4fafile))
-te_fa <-  import(tefafile)
+te_fa <-  c(import(tefafile),import(ERCCfafile))
+#te_fa <-  import(tefafile)
 
 
 # the widths of the te seqs with be the coord of each te transcript in the ref
