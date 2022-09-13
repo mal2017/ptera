@@ -11,11 +11,11 @@ rule copy_salmon_indices_to_mount:
         gtf = refs_wf("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf"),
         tx2gene = refs_wf("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2txsymbol.tsv"),
     output:
-        index = temp(directory("results/indices/vanilla_salmon_tes_transcripts/index/")),
-        aux = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt"),
-        fasta = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz"),
-        gtf = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf"),
-        tx2gene = temp("results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2txsymbol.tsv"),
+        index = directory("results/indices/vanilla_salmon_tes_transcripts/index/"),
+        aux = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.aux.txt",
+        fasta = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz",
+        gtf = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf",
+        tx2gene = "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.tx2txsymbol.tsv",
     priority: 51
     shell:
         """
@@ -36,8 +36,8 @@ rule salmon_quant_se_vanilla:
         idx = rules.copy_salmon_indices_to_mount.output.index,
         aux = rules.copy_salmon_indices_to_mount.output.aux,
     output:
-        sf = "results/quantification/vanilla_salmon_tes_transcripts/quant/{sample}/quant.sf",
-        #sam = temp("results/quantification/vanilla_salmon_tes_transcripts/{sample}/alignments/alignments.sam")
+        sf = "results/quantification/vanilla_salmon_tes_transcripts/quant/{sample}/{quant_rep}/quant.sf",
+        #sam = temp("results/quantification/vanilla_salmon_tes_transcripts/{sample}/{quant_rep}/alignments/alignments.sam")
     resources:
         time=60,
         mem=20000,
@@ -55,7 +55,7 @@ rule salmon_quant_se_vanilla:
     threads:
         8
     log:
-        "results/logs/salmon_quant_se_vanilla/{sample}.txt"
+        "results/logs/salmon_quant_se_vanilla/{sample}.{quant_rep}.txt"
     singularity:
         "docker://quay.io/biocontainers/salmon:1.5.2--h84f40af_0"
     priority: 51
@@ -77,27 +77,48 @@ rule salmon_quant_se_vanilla:
             -o $(dirname {output.sf})/ 2> {log}
         """
 
+rule vanilla_salmon_linked_txome:
+    input:
+        idx = rules.copy_salmon_indices_to_mount.output.index,
+        fasta = rules.copy_salmon_indices_to_mount.output.fasta,
+        gtf = rules.copy_salmon_indices_to_mount.output.gtf,
+        tx2gene = rules.copy_salmon_indices_to_mount.output.tx2gene,
+    output:
+        json = "results/quantification/vanilla_salmon_tes_transcripts/tximeta.json",
+    singularity:
+        "docker://quay.io/biocontainers/bioconductor-tximeta:1.10.0--r41hdfd78af_0"
+    resources:
+        time=10,
+        mem=4000,
+        cpus=1
+    params:
+        flybase_release = config.get("FLYBASE_RELEASE"),
+        genome_version = config.get("GENOME_VERSION"),
+    log:
+        "results/logs/vanilla_salmon_linked_txome/log.txt"
+    script:
+        "../scripts/vanilla_salmon_linked_txome.R"
+
 rule vanilla_salmon_tximeta:
     """
     tximeta was used to summarize expression estimates and include metadata in summarizedExperiment objects.
     """
     input:
+        json = rules.vanilla_salmon_linked_txome.output.json,
+        samples = "config/sample_table.csv", # TODO make this the output of the anno rule
+        salmon_files = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/{{quant_rep}}/quant.sf", s=SAMPLES),
+        tx2gene = rules.copy_salmon_indices_to_mount.output.tx2gene,
+        pipeline_meta = rules.get_pipeline_info.output,
+        # not manually used in this script, but must still exist
         idx = rules.copy_salmon_indices_to_mount.output.index,
         fasta = rules.copy_salmon_indices_to_mount.output.fasta,
         gtf = rules.copy_salmon_indices_to_mount.output.gtf,
-        samples = "config/sample_table.csv", # TODO make this the output of the anno rule
-        salmon_files = expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf", s=SAMPLES),
-        tx2gene = rules.copy_salmon_indices_to_mount.output.tx2gene,
-        pipeline_meta = rules.get_pipeline_info.output,
     output:
-        json = "results/quantification/vanilla_salmon_tes_transcripts/tximeta.json",
-        salmon = "results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds",
-        salmon_tx ="results/quantification/vanilla_salmon_tes_transcripts/se.transcript.rds",
+        salmon = "results/quantification/vanilla_salmon_tes_transcripts/se.gene.{quant_rep}.rds",
+        salmon_tx ="results/quantification/vanilla_salmon_tes_transcripts/se.transcript.{quant_rep}.rds",
     singularity:
         "docker://quay.io/biocontainers/bioconductor-tximeta:1.10.0--r41hdfd78af_0"
     params:
-        flybase_release = config.get("FLYBASE_RELEASE"),
-        genome_version = config.get("GENOME_VERSION"),
         counts_from_abundance_salmon = config.get("SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE"),
         counts_from_abundance_salmon_txout = config.get("SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TXOUT"),
     resources:
@@ -105,6 +126,6 @@ rule vanilla_salmon_tximeta:
         mem=128000,
         cpus=1
     log:
-        "results/logs/vanilla_salmon_tximeta/log.txt"
+        "results/logs/vanilla_salmon_tximeta/log.{quant_rep}.txt"
     script:
         "../scripts/vanilla_salmon_tximeta.R"

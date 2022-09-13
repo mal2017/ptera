@@ -1,49 +1,18 @@
 library(tximeta)
 library(BiocFileCache)
 
-# -----------------------------------------------------------------------------
-# make tximeta json record
-# -----------------------------------------------------------------------------
-
-#jsonFile <- "results/quantification/vanilla_salmon_tes_transcripts/tximeta.json"
-jsonFile <- snakemake@output[["json"]]
-
-#indexDir <- "results/quantification/vanilla_salmon_tes_transcripts/index/"
-indexDir <- snakemake@input[["idx"]]
-
-#flybase_release <- "FB2021_04"
-flybase_release <- snakemake@params[["flybase_release"]]
-
-#genome_version <- "r6.41"
-genome_version <- snakemake@params[["genome_version"]]
-
-#tx_fasta <- "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.fasta.gz"
-#tx_gtf <- "results/references/transcripts_and_consensus_tes/transcripts_and_consensus_tes.gtf"
-tx_fasta <- snakemake@input[["fasta"]]
-tx_gtf <- snakemake@input[["gtf"]]
-
-makeLinkedTxome(indexDir = indexDir, source = "Flybase + repeats",
-                organism = "Drosophila melanogaster",
-                jsonFile = jsonFile,
-                release = flybase_release,
-                fasta = tx_fasta,
-                gtf = tx_gtf,
-                genome = genome_version)
-
-# remove cache
-if (interactive()) {
-  bfcloc <- getTximetaBFC()
-} else {
-  bfcloc <- tempdir()
-}
-bfc <- BiocFileCache(bfcloc)
-bfcremove(bfc, bfcquery(bfc, "linkedTxomeTbl")$rid)
+jsonFile <- snakemake@input[["json"]]
 
 loadLinkedTxome(jsonFile)
+
+
 
 # -----------------------------------------------------------------------------
 # make tximeta object
 # -----------------------------------------------------------------------------
+
+tx_fasta <- snakemake@input[["fasta"]]
+tx_gtf <- snakemake@input[["gtf"]]
 
 # get sample table
 #samples_fl <- "config/sample_table.csv"
@@ -51,10 +20,13 @@ samples_fl <- snakemake@input[["samples"]]
 samples <- read.csv(samples_fl,header = T)
 
 # name the quant files so reordering is possible
-#files <- Sys.glob("results/quantification/vanilla_salmon_tes_transcripts/quant/*/quant.sf")
+#files <- Sys.glob("results/quantification/vanilla_salmon_tes_transcripts/quant/*/0/quant.sf")
 files <- snakemake@input[["salmon_files"]]
 
-names(files) <- gsub("\\/+quant.sf","",x=gsub(".+quant\\/+","",files))
+# from before replicated salmon runs
+#names(files) <- gsub("\\/+quant.sf","",x=gsub(".+quant\\/+","",files))
+names(files) <- gsub("\\/\\d+\\/+quant.sf","",x=gsub(".+quant\\/+","",files))
+
 
 # useful for testing a smaller subset, also good as foolproofing
 # in case some samples aren't quantified and this script is run manually
@@ -95,7 +67,7 @@ salmon_tx_se <- tximeta(samples,
 gtf <- rtracklayer::import(tx_gtf)
 #summary(gtf$type)
 
-allowed.types <- c("mRNA","pseudogene","ncRNA")
+allowed.types <- c("mRNA")
 
 allowed.features <- unique(gtf[gtf$type %in% allowed.types]$transcript_id)
 

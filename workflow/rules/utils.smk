@@ -80,9 +80,9 @@ rule se_export_txt:
     SummarizedExperiment object.
     """
     input:
-        se="results/quantification/{quant_pipeline}/se.{feature_level}.rds",
+        se="results/quantification/{quant_pipeline}/se.{feature_level}.{quant_rep}.rds",
     output:
-        txt="results/quantification/{quant_pipeline}/{sex}.{feature_level}.{cnnorm}.{expression_unit}.tsv.gz"
+        txt="results/quantification/{quant_pipeline}/{sex}.{feature_level}.{cnnorm}.{expression_unit}.{quant_rep}.tsv.gz"
     resources:
         time=240,
         mem=20000,
