@@ -25,7 +25,7 @@ get_overlaps_per_strain <- function(ins_obj, genes, feature_df) {
   feature_df <- as_tibble(gr) %>% mutate(queryHits=row_number())
 
   # should we really be counting overlaps here?
-  findOverlaps(gr,gr) %>%
+  findOverlaps(gr,gr,ignore.strand=TRUE) %>%
     as_tibble() %>%
     filter(queryHits != subjectHits) %>%
     right_join(feature_df,., by="queryHits") %>%

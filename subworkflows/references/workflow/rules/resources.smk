@@ -11,6 +11,7 @@ rule get_resources_in_mount:
         TRANSCRIPTOME_GTF = "../../" + config.get("TRANSCRIPTOME_GTF"),
         COMBINED_TE_GENOME_FA = "../../" + config.get("COMBINED_TE_GENOME_FA"),
         COMBINED_TE_FEATURE_GTF = "../../" + config.get("COMBINED_TE_FEATURE_GTF"),
+        REPEATMASKED_LOCI = "../../" + config.get("REPEATMASKED_LOCI"),
         MISCRNA_FASTA = "../../" + config.get("MISCRNA_FASTA"),
         NCRNA_FASTA = "../../" + config.get("NCRNA_FASTA"),
         TRNA_FASTA = "../../" + config.get("TRNA_FASTA"),
@@ -23,6 +24,7 @@ rule get_resources_in_mount:
         TRANSCRIPTOME_GTF= "results/" + config.get("TRANSCRIPTOME_GTF"),
         COMBINED_TE_GENOME_FA = "results/" + config.get("COMBINED_TE_GENOME_FA"),
         COMBINED_TE_FEATURE_GTF = "results/" + config.get("COMBINED_TE_FEATURE_GTF"),
+        REPEATMASKED_LOCI = "results/" + config.get("REPEATMASKED_LOCI"),
         MISCRNA_FASTA = "results/" + config.get("MISCRNA_FASTA"),
         NCRNA_FASTA = "results/"+ config.get("NCRNA_FASTA"),
         TRNA_FASTA = "results/" + config.get("TRNA_FASTA"),
@@ -36,6 +38,7 @@ rule get_resources_in_mount:
         cp {input.TRANSCRIPTOME_GTF} {output.TRANSCRIPTOME_GTF}
         cp {input.COMBINED_TE_GENOME_FA} {output.COMBINED_TE_GENOME_FA}
         cp {input.COMBINED_TE_FEATURE_GTF} {output.COMBINED_TE_FEATURE_GTF}
+        cp {input.REPEATMASKED_LOCI} {output.REPEATMASKED_LOCI}
         cp {input.MISCRNA_FASTA} {output.MISCRNA_FASTA}
         cp {input.NCRNA_FASTA} {output.NCRNA_FASTA}
         cp {input.TRNA_FASTA} {output.TRNA_FASTA}

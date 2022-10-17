@@ -1,6 +1,6 @@
 rule extract_polymorphic_insertions_0:
     input:
-        "../../resources/Tidal_Fly_v1Archive20150930.zip"
+        "../../" + config.get("TIDAL_ZIP")
     output:
         dgn = temp("results/overlaps/polymorphic_insertions/DGN_flies.zip"),
         labstrain = temp("results/overlaps/polymorphic_insertions/LabStrain_flies.zip"),
