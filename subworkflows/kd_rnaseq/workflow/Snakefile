@@ -17,7 +17,7 @@ subworkflow refs_wf:
 
 rule all:
     input:
-        "results/quantification/vanilla_salmon_tes_transcripts/se.gene.rds",
+        "results/quantification/vanilla_salmon_tes_transcripts/se.gene.0.rds",
         "results/fastqc/"
 
 
