@@ -29,6 +29,7 @@ REPEATMASKED_LOCI: resources/plus-repeats.repeatmasked.fixednames.bed
 
 # TIDAL BULK RESULTS
 TIDAL_ZIP: "resources/Tidal_Fly_v1Archive20150930.zip"
+MAXGAP_FOR_TE_OVERLAP: 5000
 
 
 # Salmon indices for standard quantification approach

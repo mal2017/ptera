@@ -33,13 +33,10 @@ subworkflow refs_wf:
 
 rule all:
     input:
-        #expand("results/quantification/vanilla_salmon_tes_transcripts/quant/{s}/quant.sf",s=SAMPLES),
         expand("results/linear_models/{m}/{qr}/lm.tidy.corrected.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),qr=[0,1,2]),
-        #expand("results/linear_models/{m}/coefs.mat.tsv.gz",m=config.get("LM_MODELS_TO_FIT")),
-        #wgs_wf("results/copies/copies.tsv")
-        #expand("results/linear_models/{lms}/lm.{r}.tsv.gz",lms=config.get("LM_MODELS_TO_FIT"),r=["tidy","glance"]),
-        #expand("results/reads/fastp/{s}_r1.trimmed.fq.gz",s="DGRP_Line_100_Female_SAMN09738660")
-        #expand("results/reads/dump/{s}/{e}/{r}/",s="DGRP_Line_100_Female_SAMN09738660",e=["SRX4483514"],r=['SRR7619150', 'SRR7619149'])
+        expand("results/linear_models/{m}/{qr}/lm.{o}.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),o=["glance","anova","breusch_pagan","rainbow"],qr=[0,1,2]),
+        expand("results/linear_models/{m}/{qr}/lm.collected-info.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),qr=[0,1,2]),
+        expand("results/linear_models/{m}.collected-info.tsv.gz",m=config.get("LM_MODELS_TO_FIT"))
 
 include: "../../../workflow/rules/download.smk"
 include: "../../../workflow/rules/trim.smk"

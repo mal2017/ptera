@@ -49,27 +49,31 @@ rule chunked_linear_model:
         copies = wgs_wf("results/copies/copies.tsv") if config.get("INCL_COPY_ESTIMATION_IN_EXPORT") else rules.dummy_copies.output.feats
     output:
         tidy = temp("results/linear_models/{model_id}/{quant_rep}/chunk_{lmchunk}.tidy.tsv"),
+        glance = temp("results/linear_models/{model_id}/{quant_rep}/chunk_{lmchunk}.glance.tsv"),
+        anova = temp("results/linear_models/{model_id}/{quant_rep}/chunk_{lmchunk}.anova.tsv"),
+        breusch_pagan = temp("results/linear_models/{model_id}/{quant_rep}/chunk_{lmchunk}.breusch_pagan.tsv"),
+        rainbow = temp("results/linear_models/{model_id}/{quant_rep}/chunk_{lmchunk}.rainbow.tsv"),
     params:
         formula = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_FORMULA"),
         alt_formula = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_ALT_FORMULA"),
         mads_filter = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_MADS_FILTER"),
     conda:
-        "../envs/tls_linmod_v1.yaml"
+        "../envs/baselm_v1.yaml"
     resources:
         time=20,
         mem=10000,
         cpus=1
     script:
-        "../scripts/linear_model_v04.R"
+        "../scripts/linear_model_baselm_v01.R"
 
 rule collect_chunked_linear_models:
     """
     Note: Escape brackets on wcs when using in conjunction w/ scattergather.
     """
     input:
-        lambda wc: expand("results/linear_models/{{model_id}}/{{quant_rep}}/chunk_{ch}.tidy.tsv",ch = [str(x).zfill(4) for x in range(0,config.get("LM_CHUNKS",80))])
+        lambda wc: expand("results/linear_models/{{model_id}}/{{quant_rep}}/chunk_{ch}.{lmr}.tsv",lmr=wc.lmresult,ch = [str(x).zfill(4) for x in range(0,config.get("LM_CHUNKS",80))])
     output:
-        "results/linear_models/{model_id}/{quant_rep}/lm.tidy.tsv.gz"
+        "results/linear_models/{model_id}/{quant_rep}/lm.{lmresult}.tsv.gz"
     resources:
         time=60,
         mem=24000,
@@ -90,4 +94,32 @@ rule correct_tls_lm_coefs:
     conda:
         "../envs/correct_coefs.yaml"
     script:
-        "../scripts/correct_lm_coefs.R"
+        "../scripts/correct_lm_coefs_baselm.R"
+
+
+rule collect_lm_info_per_rep:
+    input:
+        anova= "results/linear_models/{model_id}/{quant_rep}/lm.anova.tsv.gz",
+        rainbow= "results/linear_models/{model_id}/{quant_rep}/lm.rainbow.tsv.gz",
+        breusch_pagan= "results/linear_models/{model_id}/{quant_rep}/lm.breusch_pagan.tsv.gz",
+        glance= "results/linear_models/{model_id}/{quant_rep}/lm.glance.tsv.gz",
+        tidy_correct= rules.correct_tls_lm_coefs.output.tsv
+    output:
+        tsv= "results/linear_models/{model_id}/{quant_rep}/lm.collected-info.tsv.gz"
+    params:
+        model = "{model_id}",
+        rep =  "{quant_rep}"
+    conda:
+        "../envs/baselm_v1.yaml"
+    script:
+        "../scripts/collect_lm_info_per_rep.R"
+
+rule collect_lm_info_per_model:
+    input:
+        info = expand("results/linear_models/{{model_id}}/{r}/lm.collected-info.tsv.gz",r=[0,1,2])
+    output:
+        tsv= "results/linear_models/{model_id}.collected-info.tsv.gz"
+    conda:
+        "../envs/baselm_v1.yaml"
+    script:
+        "../scripts/collect_lm_info_per_model.R"

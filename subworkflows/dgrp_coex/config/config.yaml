@@ -40,9 +40,12 @@ LM_FEATURE_FILT: "(((!str_detect(rownames(x),'FBgn')) & rowSums(x > 1) > 10) | (
 # LM_FORMULA: Covariate options include wolbachia, overlap, scaled.copies.y/x, est.copies.y/x, length.y/x, sex, age.
 # LM_ALT_FORMULA: Overlaps are sparse and often lead to singular values. Alternate formula can be used to exclude 'overlap' as cov.
 # LM_SEX: male, female, or both
-# LM_VARIABLE_TRANSFORM: for no transform just put 'x', or for countlike data something like log2(x+1). This is applied before any scaling.
+# LM_VARIABLE_TRANSFORM: for no transform just put 'x', or for countlike data something like log2(x+1). 
+#    If something like vst is used, this should be set to 'x'. This is applied before any scaling.
 # LM_VARIABLE_SCALE: if True, scale genes to have mean 0 and sd 1 - mostly important for regressing out variables
 # LM_CORRECT_N_PCS: number of pcs to correct for with WGCNA
+
+# NOTE: if using tls::tls for fitting the lm, must suppress intercept term by including '0' in formulas
 LM_MODELS_TO_FIT:
   male_model_01:
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts
@@ -50,8 +53,8 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_UNITS: vst
     LM_CNNORM: per_feature
     LM_MADS_FILTER: 3
-    LM_FORMULA: y ~ 0 + wolbachia + overlap + scaled.copies.y + x
-    LM_ALT_FORMULA: y ~ 0 + wolbachia + scaled.copies.y + x
+    LM_FORMULA: y ~ wolbachia + overlap + scaled.copies.y + x
+    LM_ALT_FORMULA: y ~ wolbachia + scaled.copies.y + x
     LM_SEX: male
     LM_VARIABLE_TRANSFORM: x
     LM_VARIABLE_SCALE: TRUE
@@ -62,8 +65,8 @@ LM_MODELS_TO_FIT:
     LM_FIT_FOR_UNITS: vst
     LM_CNNORM: per_feature
     LM_MADS_FILTER: 3
-    LM_FORMULA: y ~ 0 + wolbachia + overlap + scaled.copies.y + x
-    LM_ALT_FORMULA: y ~ 0 + wolbachia + scaled.copies.y + x
+    LM_FORMULA: y ~ wolbachia + overlap + scaled.copies.y + x
+    LM_ALT_FORMULA: y ~ wolbachia + scaled.copies.y + x
     LM_SEX: female
     LM_VARIABLE_TRANSFORM: x
     LM_VARIABLE_SCALE: TRUE

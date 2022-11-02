@@ -93,6 +93,8 @@ rule feature_overlaps:
         ins = rules.collect_all_tidal_insertions.output
     output:
         tsv="results/overlaps/overlaps.tsv.gz"
+    params:
+        maxgap =  config.get("MAXGAP_FOR_TE_OVERLAP")
     resources:
         time=20,
         mem=12000,
