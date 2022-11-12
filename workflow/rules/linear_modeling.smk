@@ -17,6 +17,49 @@ rule filter_transform_scale:
     script:
         "../scripts/filter_transform_scale.R"
 
+rule gene_x_gene_corr:
+    input:
+        expr = rules.filter_transform_scale.output.mat
+    output:
+        rds = "results/linear_models/{model_id}/{quant_rep}/gene_x_gene.corrr.rds",
+    conda:
+        "../envs/corrr.yaml"
+    resources:
+        time=20,
+        mem=48000,
+        cpus=1
+    script:
+        "../scripts/gene_x_gene_corr.R"
+
+rule mean_gene_corr:
+    input:
+        expand("results/linear_models/{{model_id}}/{r}/gene_x_gene.corrr.rds",r=[0,1,2])
+    output:
+        rds = "results/linear_models/{model_id}.expression.corrr.rds"
+    conda:
+        "../envs/corrr.yaml"
+    resources:
+        time=60,
+        mem=96000,
+        cpus=1
+    script:
+        "../scripts/mean_gene_corr.R"
+
+rule gene_gene_edges:
+    input:
+        cor = rules.mean_gene_corr.output.rds,
+    output:
+        edges_rds = "results/linear_models/{model_id}.gene_2_gene_edges.rds",
+        nudges_rds = "results/linear_models/{model_id}.gene_2_gene_nudges.rds",       
+    conda:
+        "../envs/corrr.yaml"
+    params:
+        model_id = "{model_id}"
+    resources:
+        time=60,
+        mem=96000,
+    script:
+        "../scripts/gene_gene_edges.R"
 
 rule scatter_genes_for_lm:
     """
@@ -123,3 +166,22 @@ rule collect_lm_info_per_model:
         "../envs/baselm_v1.yaml"
     script:
         "../scripts/collect_lm_info_per_model.R"
+
+
+rule per_te_coex_gene_overlap_fisher_test:
+    input:
+        edges = rules.gene_gene_edges.output.edges_rds,
+        nudges = rules.gene_gene_edges.output.nudges_rds,
+        lms = rules.collect_lm_info_per_model.output.tsv,
+        ol = refs_wf("results/overlaps/overlaps.tsv.gz"),
+    output:
+        rds = "results/linear_models/{model_id}.higher_order_overlap_fisher.rds"
+    conda:
+        "../envs/corrr.yaml"
+    params:
+        model_id = "{model_id}"
+    resources:
+        time=60,
+        mem=96000,
+    script:
+        "../scripts/per_te_coex_gene_overlap_fisher_test.R"

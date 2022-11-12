@@ -6,38 +6,44 @@ info_fls <- snakemake@input[["info"]]
 info <- info_fls %>% map_df(read_tsv)
 
 # annotate as valid if it passes breusch pagan and rainbow tests 
-# and the overall fit is significant
 info <- info %>%
-  mutate(valid = p.value_breuschpagan > 0.05 & p.value_rainbow > 0.05 & p.value_ftest_r2 < 0.05)
+  mutate(valid = p.value_breuschpagan > 0.05 & p.value_rainbow > 0.05)
   
 # note as reproducible if all reps suggest nonsignificance or all reps are
 # significant and have same signs for gene expression coefs
 info <- info %>%
   group_by(model,feature.x,feature.y) %>%
+  mutate(significant_model_0 = all(p.value_ftest_r2 < 0.05)) %>%
   mutate(reproducible = all(valid) & 
            (
-             all(p.value_anova_x > 0.05) | 
-               (all(p.value_anova_x < 0.05) & length(unique(sign(estimate)))==1)
+             all(!significant_model_0) | 
+               (all(significant_model_0) & length(unique(sign(estimate)))==1)
              )
          )
 
-# for each gene/te pair, take the least significant and lowest effect size
-# model rep as the representative, to be conservative.
+# for each gene/te pair, take the best fitting model overall to be safe with ties broen by highest pvalue for the gene coef, to be conservative
 info <- info %>%
   group_by(model,feature.x,feature.y) %>%
-  slice_max(p.value_anova_x, n=1) %>%
-  slice_min(abs(estimate.qnorm),n=1,with_ties = F)
+  slice_min(p.value_ftest_r2, n=1) %>%
+  slice_max(p.value_anova_x,n=1,with_ties = F)
   
-# now adjust p values once we have 1 model per te/gene pair
+# now adjust term p values once we have 1 model per te/gene pair
+# note that I also previously adjusted f test p values above,
+# but I think it makes more sense to do this after
+# finding representative rep for each TE/gene pair such that the adjustment
+# is performed on p vals actually in the results table
 info <- info %>%  
   group_by(model) %>%
   mutate(across(starts_with("p.value_anova"),
                 ~p.adjust(.x,method="BH"),
                 .names= "adj_{.col}")) %>%
-  ungroup()
+  mutate(adj_p.value_ftest_r2 = p.adjust(p.value_ftest_r2,method="BH")) %>%
+  ungroup() %>%
+  dplyr::select(-significant_model_0)
     
-info <- info %>%  
-  mutate(significant = adj_p.value_anova_x < 0.1 & reproducible & valid)
+info <- info %>%
+  mutate(significant_model = adj_p.value_ftest_r2 < 0.1 & reproducible & valid) %>%
+  mutate(significant_x = adj_p.value_anova_x < 0.1 & significant_model)
 
 gene_universe <- read_tsv("http://ftp.flybase.net/releases/FB2022_04/precomputed_files/genes/fbgn_fbtr_fbpp_expanded_fb_2022_04.tsv.gz", skip = 4)
 
