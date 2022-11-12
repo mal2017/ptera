@@ -89,6 +89,7 @@ rule chunked_linear_model:
         dat = rules.filter_transform_scale.output.mat,
         cd = rules.collect_metadata.output,
         ol = refs_wf("results/overlaps/overlaps.tsv.gz"),
+        edges = rules.gene_gene_edges.output.edges_rds,
         copies = wgs_wf("results/copies/copies.tsv") if config.get("INCL_COPY_ESTIMATION_IN_EXPORT") else rules.dummy_copies.output.feats
     output:
         tidy = temp("results/linear_models/{model_id}/{quant_rep}/chunk_{lmchunk}.tidy.tsv"),
@@ -104,7 +105,7 @@ rule chunked_linear_model:
         "../envs/baselm_v1.yaml"
     resources:
         time=20,
-        mem=10000,
+        mem=24000,
         cpus=1
     script:
         "../scripts/linear_model_baselm_v01.R"
