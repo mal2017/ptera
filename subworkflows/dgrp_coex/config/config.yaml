@@ -71,3 +71,29 @@ LM_MODELS_TO_FIT:
     LM_VARIABLE_TRANSFORM: x
     LM_VARIABLE_SCALE: TRUE
     LM_CORRECT_N_PCS: 4
+  male:
+    LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts
+    LM_FIT_FOR_FEATURE_LEVEL: "gene"
+    LM_FIT_FOR_UNITS: vst
+    LM_CNNORM: per_feature
+    LM_MADS_FILTER: 3
+    LM_FORMULA: y ~ wolbachia + overlap + scaled.copies.y + overlap.coex.gene + x
+    LM_ALT_FORMULA: y ~ wolbachia + scaled.copies.y + overlap.coex.gene + x
+    LM_SEX: male
+    LM_VARIABLE_TRANSFORM: x
+    LM_VARIABLE_SCALE: TRUE
+    LM_CORRECT_N_PCS: 4
+  female:
+    LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts
+    LM_FIT_FOR_FEATURE_LEVEL: "gene"
+    LM_FIT_FOR_UNITS: vst
+    LM_CNNORM: per_feature
+    LM_MADS_FILTER: 3
+    LM_FORMULA: y ~ wolbachia + overlap + scaled.copies.y + overlap.coex.gene + x
+    LM_ALT_FORMULA: y ~ wolbachia + scaled.copies.y + overlap.coex.gene + x
+    LM_SEX: female
+    LM_VARIABLE_TRANSFORM: x
+    LM_VARIABLE_SCALE: TRUE
+    LM_CORRECT_N_PCS: 4
+
+LMS_TO_EXPORT: [male,female]

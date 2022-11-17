@@ -14,6 +14,10 @@ rule filter_transform_scale:
         transforms = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_VARIABLE_TRANSFORM"),
         scale = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_VARIABLE_SCALE"),
         pcs = lambda wc: config.get("LM_MODELS_TO_FIT").get(wc.model_id).get("LM_CORRECT_N_PCS"),
+    resources:
+        time=20,
+        mem=24000,
+        cpus=1
     script:
         "../scripts/filter_transform_scale.R"
 
@@ -165,6 +169,10 @@ rule collect_lm_info_per_model:
         tsv= "results/linear_models/{model_id}.collected-info.tsv.gz"
     conda:
         "../envs/baselm_v1.yaml"
+    resources:
+        time=60,
+        mem=96000,
+        cpus=1
     script:
         "../scripts/collect_lm_info_per_model.R"
 
@@ -182,7 +190,20 @@ rule per_te_coex_gene_overlap_fisher_test:
     params:
         model_id = "{model_id}"
     resources:
-        time=60,
-        mem=96000,
+        time=120,
+        mem=128000,
     script:
         "../scripts/per_te_coex_gene_overlap_fisher_test.R"
+
+rule export_linear_models:
+    input:
+        expand("results/linear_models/{m}.collected-info.tsv.gz",m=config.get("LMS_TO_EXPORT"))
+    output:
+        tsv = temp("results/linear_models/final-models.collected-info.tsv"),
+        gz = "results/linear_models/final-models.collected-info.tsv.gz"
+    shell:
+        """
+        zgrep 'anova' {input[0]} > {output.tsv} &&
+        zcat {input} | grep -h -v 'anova' >> {output.tsv} &&
+        gzip -c {output.tsv} > {output.gz}
+        """
