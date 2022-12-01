@@ -61,7 +61,7 @@ def aggregate_known_insertions_within_group(wildcards):
            tidal_group=wildcards.tidal_group,
            i=x.d)
 
-localrules: collect_all_tidal_insertions, collect_known_insertions_within_group
+localrules: collect_all_tidal_insertions
 
 rule collect_known_insertions_within_group:
     input:
@@ -72,8 +72,8 @@ rule collect_known_insertions_within_group:
         time=60,
         mem=24000,
         cpus=1
-    shell:
-        "xsv cat rows -d '\t' {input} | tr ',' '\t' > {output}"
+    script:
+        "../scripts/collect_known_insertions_within_group.R"
 
 rule collect_all_tidal_insertions:
     input:
