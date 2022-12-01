@@ -6,7 +6,6 @@ configfile: "config/config.yaml"
 pepfile: config.get("PEP")
 
 SAMPLES = [x.sample_name for x in pep.samples]
-SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:4]
 
 SUBSAMPLE_TABLE = pep.subsample_table
 
@@ -21,24 +20,81 @@ subworkflow wgs_wf:
         "../subworkflows/dgrp_wgs/"
     snakefile:
         "../subworkflows/dgrp_wgs/workflow/Snakefile"
+    configfile:
+        "subworkflows/dgrp_wgs/config/config.yaml"
 
 subworkflow dgrp_coex_wf:
     workdir:
         "../subworkflows/dgrp_coex/"
     snakefile:
         "../subworkflows/dgrp_coex/workflow/Snakefile"
+    configfile:
+        "subworkflows/dgrp_coex/config/config.yaml"
+
+subworkflow tfrnai_wf:
+    workdir:
+        "../subworkflows/tfrnai_rnaseq/"
+    snakefile:
+        "../subworkflows/tfrnai_rnaseq/workflow/Snakefile"
+    configfile:
+        "subworkflows/tfrnai_rnaseq/config/config.yaml"
+
+subworkflow kd_rna_wf:
+    workdir:
+        "../subworkflows/kd_rnaseq/"
+    snakefile:
+        "../subworkflows/kd_rnaseq/workflow/Snakefile"
+    configfile:
+        "subworkflows/kd_rnaseq/config/config.yaml"
 
 
-rule all:
+localrules: bundle_upstream
+
+rule bundle_upstream:
     input:
-        dgrp_coex_wf(expand("results/linear_models/{m}/coefs.mat.tsv.gz",m=config.get("LM_MODELS_TO_FIT"))),
-        dgrp_coex_wf(expand("results/linear_models/{m}/lm.{r}.tsv.gz",m=config.get("LM_MODELS_TO_FIT"),r=["tidy"])),
-        #wgs_wf("results/copies/copies.tsv")
+        lms = dgrp_coex_wf("results/linear_models/final-models.collected-info.tsv.gz"),
+        copies = wgs_wf("results/copies/copies.tsv"),
+        dgrp_ins = refs_wf("results/overlaps/collected_insertions/DGRP_flies.tsv"),
+        rep_kd_se = kd_rna_wf("results/quantification/vanilla_salmon_tes_transcripts/se.gene.0.rds"),
+        overlaps = refs_wf("results/overlaps/overlaps.tsv.gz"),
+        ref_ins = refs_wf("results/repeatmasker/reference_insertions.bed"),
+        rep_dgrp_se = dgrp_coex_wf("results/quantification/vanilla_salmon_tes_transcripts/se.gene.0.rds"),
+        rep_tfrnai_se = tfrnai_wf("results/quantification/vanilla_salmon_tes_transcripts/se.gene.0.rds"),
+    # input:
+    #     lms = "results/linear_models/final-models.collected-info.tsv.gz",
+    #     copies = "results/copies/copies.tsv",
+    #     dgrp_ins = "results/overlaps/collected_insertions/DGRP_flies.tsv",
+    #     rep_kd_se = "results/quantification/vanilla_salmon_tes_transcripts/se.gene.0.rds",
+    #     overlaps = "results/overlaps/overlaps.tsv.gz",
+    #     ref_ins = "results/repeatmasker/reference_insertions.bed",
+    #     rep_dgrp_se = "results/quantification/vanilla_salmon_tes_transcripts/se.gene.0.rds",
+    #     rep_tfrnai_se = "results/quantification/vanilla_salmon_tes_transcripts/se.gene.0.rds",
+    output:
+        lms = "results/upstream/final-models.collected-info.tsv.gz",
+        copies = "results/upstream/copies.tsv",
+        dgrp_ins = "results/upstream/DGRP_flies.tsv",
+        rep_kd_se = "results/upstream/kd.se.gene.0.rds",
+        overlaps = "results/upstream/overlaps.tsv.gz",
+        ref_ins = "results/upstream/reference_insertions.bed",
+        rep_dgrp_se = "results/upstream/se.gene.0.rds",
+        rep_tfrnai_se = "results/upstream/tfrnai.se.gene.0.rds",
+    shell:
+        """
+        cp {input.lms} {output.lms}
+        cp {input.copies} {output.copies}
+        cp {input.dgrp_ins} {output.dgrp_ins}
+        cp {input.rep_kd_se} {output.rep_kd_se}
+        cp {input.overlaps} {output.overlaps}
+        cp {input.ref_ins} {output.ref_ins}
+        cp {input.rep_dgrp_se} {output.rep_dgrp_se}
+        cp {input.rep_tfrnai_se} {output.rep_tfrnai_se}
+        """
 
 
-include: "rules/download.smk"
-include: "rules/trim.smk"
-include: "rules/utils.smk"
-include: "rules/vanilla_salmon.smk"
-include: "rules/metadata.smk"
-include: "rules/linear_modeling.smk"
+
+# include: "rules/download.smk"
+# include: "rules/trim.smk"
+# include: "rules/utils.smk"
+# include: "rules/vanilla_salmon.smk"
+# include: "rules/metadata.smk"
+# include: "rules/linear_modeling.smk"

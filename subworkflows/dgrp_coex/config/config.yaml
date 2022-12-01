@@ -5,6 +5,35 @@ PEP: config/pep.yaml
 FLYBASE_RELEASE: FB2021_04
 GENOME_VERSION: r6.41
 
+
+
+# --------------------------- job options --------------------------------------
+FASTERQDUMP_MEM: 24000
+
+# Salmon quant (standard quantification approach)
+# standard for dUTP, which the DGRP data is. Confirmed by aligning SAMN09738660 - reads map to (-) strand
+# and further confirmed by looking at quant/DGRP_Line_195_Male_SAMN09738683/0/lib_format_counts.json
+# if in doubt just use  'A' for auto
+SALMON_VANILLA_LIBTYPE: SR 
+SALMON_VANILLA_BOOTSTRAPS: 20
+SALMON_VANILLA_SEQBIAS: TRUE
+SALMON_VANILLA_GCBIAS: TRUE
+SALMON_VANILLA_POSBIAS: TRUE
+SALMON_VANILLA_USE_AUXTARGETS: TRUE
+SALMON_VANILLA_SOFTCLIP: TRUE
+SALMON_VANILLA_INCOMPATPRIOR_0: TRUE
+
+
+# Tximport
+# these values will be "counts" for all downstream approaches. This is
+# relevant as the input to DESeq2 but also because some normalizations are run
+# on these directly. So, that means those normalizations are run on totally raw
+# counts if the params below == "no"
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE: scaledTPM # no, scaledTPM, lengthScaledTPM
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TXOUT: dtuScaledTPM # no, scaledTPM, lengthScaledTPM, dtuScaledTPM
+SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS: scaledTPM # no, scaledTPM, lengthScaledTPM
+
+
 # export of expression to a tab sep matrix. Multiple export units/norms/transforms
 # are available. Also possible is normalization to estimated TE copy number,
 # which necessarily is performed prior to vst, fpkm, etc, quantile norm, etc.
@@ -47,30 +76,30 @@ LM_FEATURE_FILT: "(((!str_detect(rownames(x),'FBgn')) & rowSums(x > 1) > 10) | (
 
 # NOTE: if using tls::tls for fitting the lm, must suppress intercept term by including '0' in formulas
 LM_MODELS_TO_FIT:
-  male_model_01:
-    LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts
-    LM_FIT_FOR_FEATURE_LEVEL: "gene"
-    LM_FIT_FOR_UNITS: vst
-    LM_CNNORM: per_feature
-    LM_MADS_FILTER: 3
-    LM_FORMULA: y ~ wolbachia + overlap + scaled.copies.y + x
-    LM_ALT_FORMULA: y ~ wolbachia + scaled.copies.y + x
-    LM_SEX: male
-    LM_VARIABLE_TRANSFORM: x
-    LM_VARIABLE_SCALE: TRUE
-    LM_CORRECT_N_PCS: 4
-  female_model_01:
-    LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts
-    LM_FIT_FOR_FEATURE_LEVEL: "gene"
-    LM_FIT_FOR_UNITS: vst
-    LM_CNNORM: per_feature
-    LM_MADS_FILTER: 3
-    LM_FORMULA: y ~ wolbachia + overlap + scaled.copies.y + x
-    LM_ALT_FORMULA: y ~ wolbachia + scaled.copies.y + x
-    LM_SEX: female
-    LM_VARIABLE_TRANSFORM: x
-    LM_VARIABLE_SCALE: TRUE
-    LM_CORRECT_N_PCS: 4
+  # male_model_01:
+  #   LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts
+  #   LM_FIT_FOR_FEATURE_LEVEL: "gene"
+  #   LM_FIT_FOR_UNITS: vst
+  #   LM_CNNORM: per_feature
+  #   LM_MADS_FILTER: 3
+  #   LM_FORMULA: y ~ wolbachia + overlap + scaled.copies.y + x
+  #   LM_ALT_FORMULA: y ~ wolbachia + scaled.copies.y + x
+  #   LM_SEX: male
+  #   LM_VARIABLE_TRANSFORM: x
+  #   LM_VARIABLE_SCALE: TRUE
+  #   LM_CORRECT_N_PCS: 4
+  # female_model_01:
+  #   LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts
+  #   LM_FIT_FOR_FEATURE_LEVEL: "gene"
+  #   LM_FIT_FOR_UNITS: vst
+  #   LM_CNNORM: per_feature
+  #   LM_MADS_FILTER: 3
+  #   LM_FORMULA: y ~ wolbachia + overlap + scaled.copies.y + x
+  #   LM_ALT_FORMULA: y ~ wolbachia + scaled.copies.y + x
+  #   LM_SEX: female
+  #   LM_VARIABLE_TRANSFORM: x
+  #   LM_VARIABLE_SCALE: TRUE
+  #   LM_CORRECT_N_PCS: 4
   male:
     LM_FIT_FOR_PIPELINE: vanilla_salmon_tes_transcripts
     LM_FIT_FOR_FEATURE_LEVEL: "gene"

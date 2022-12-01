@@ -5,7 +5,7 @@ RUN_TYPE: test # full, test
 # --------------------------- Reference data -----------------------------------
 # paths in resources assume you're in the top level ptera directory
 
-# Generate with: https://github.com/mal2017/genome-plus-repeats/commit/b769b15
+# Generate with: https://github.com/mal2017/genome-plus-repeats/commit/def6661
 CONSENSUS_TE_FASTA: resources/Tidalbase_transposon_sequence.filtered.fasta.gz # must be gz
 
 # references/resources and version data
@@ -22,38 +22,17 @@ ERCC_FASTA: resources/SRM2374_ambiguities_resolved_NoPolyA_v2.erccs.FASTA.gz
 FLYBASE_RELEASE: FB2021_04
 GENOME_VERSION: r6.41
 
-#Generate with: https://github.com/mal2017/genome-plus-repeats/commit/b769b15
+#Generate with: https://github.com/mal2017/genome-plus-repeats/commit/def6661
 COMBINED_TE_GENOME_FA: resources/plus-repeats.repeatmasked.fixednames.fasta.gz
 COMBINED_TE_FEATURE_GTF: resources/plus-repeats.fixednames.gtf
 REPEATMASKED_LOCI: resources/plus-repeats.repeatmasked.fixednames.bed
 
 # TIDAL BULK RESULTS
 TIDAL_ZIP: "resources/Tidal_Fly_v1Archive20150930.zip"
-MAXGAP_FOR_TE_OVERLAP: 5000
+MAXGAP_FOR_TE_OVERLAP: 5000 # for determine what counts as a genic insertion
 
 
 # Salmon indices for standard quantification approach
 SALMON_K_PARAM: 31
-SALMON_VANILLA_USE_DECOYS: TRUE # note that this won't matter if
+SALMON_VANILLA_USE_DECOYS: TRUE 
 
-# --------------------------- job options --------------------------------------
-FASTERQDUMP_MEM: 24000
-
-# Salmon quant (standard quantification approach)
-SALMON_VANILLA_BOOTSTRAPS: 20
-SALMON_VANILLA_LIBTYPE: SR # standard for dUTP, which the DGRP data is. Confirmed by aligning SAMN09738660 - reads map to (-) strand
-SALMON_VANILLA_SEQBIAS: TRUE
-SALMON_VANILLA_GCBIAS: TRUE
-SALMON_VANILLA_POSBIAS: TRUE
-SALMON_VANILLA_USE_AUXTARGETS: TRUE
-SALMON_VANILLA_SOFTCLIP: TRUE
-SALMON_VANILLA_INCOMPATPRIOR_0: TRUE
-
-# Tximport
-# these values will be "counts" for all downstream approaches. This is
-# relevant as the input to DESeq2 but also because some normalizations are run
-# on these directly. So, that means those normalizations are run on totally raw
-# counts if the params below == "no"
-SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE: scaledTPM # no, scaledTPM, lengthScaledTPM
-SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TXOUT: dtuScaledTPM # no, scaledTPM, lengthScaledTPM, dtuScaledTPM
-SALMON_VANILLA_TXIMPORT_COUNTSFROMABUNDANCE_TERMINUS: scaledTPM # no, scaledTPM, lengthScaledTPM
