@@ -53,6 +53,8 @@ localrules: bundle_upstream
 rule bundle_upstream:
     input:
         lms = dgrp_coex_wf("results/linear_models/final-models.collected-info.tsv.gz"),
+        male_expr = dgrp_coex_wf("results/linear_models/male/0/expression.tsv.gz"),
+        female_expr = dgrp_coex_wf("results/linear_models/female/0/expression.tsv.gz"),
         copies = wgs_wf("results/copies/copies.tsv"),
         dgrp_ins = refs_wf("results/overlaps/collected_insertions/DGRP_flies.tsv"),
         rep_kd_se = kd_rna_wf("results/quantification/vanilla_salmon_tes_transcripts/se.gene.0.rds"),
@@ -71,6 +73,8 @@ rule bundle_upstream:
     #     rep_tfrnai_se = "results/quantification/vanilla_salmon_tes_transcripts/se.gene.0.rds",
     output:
         lms = "results/upstream/final-models.collected-info.tsv.gz",
+        male_expr = "results/upstream/male.0.expression.tsv.gz",
+        female_expr = "results/upstream/female.0.expression.tsv.gz",
         copies = "results/upstream/copies.tsv",
         dgrp_ins = "results/upstream/DGRP_flies.tsv",
         rep_kd_se = "results/upstream/kd.se.gene.0.rds",
@@ -81,6 +85,8 @@ rule bundle_upstream:
     shell:
         """
         cp {input.lms} {output.lms}
+        cp {input.male_expr} {output.male_expr}
+        cp {input.female_expr} {output.female_expr}
         cp {input.copies} {output.copies}
         cp {input.dgrp_ins} {output.dgrp_ins}
         cp {input.rep_kd_se} {output.rep_kd_se}

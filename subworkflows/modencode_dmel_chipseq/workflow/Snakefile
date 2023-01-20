@@ -5,8 +5,7 @@ import glob
 configfile: "config/config.yaml"
 pepfile: config.get("PEP")
 
-SAMPLES = [x.sample_name for x in pep.samples]
-SAMPLES = SAMPLES if config.get("RUN_TYPE") == "FULL" else SAMPLES[:1]
+SAMPLES = [x.sample_name for x in pep.samples if "TCF" in x.sample_name or "pan" in x.sample_name]
 
 SUBSAMPLE_TABLE = pep.subsample_table
 
@@ -20,6 +19,7 @@ rule all:
     input:
         expand("results/bigwigs/dna_bwa_mem2/{s}.bw",s=SAMPLES),
         expand("results/peaks/chip_macs/narrow/{s}_peaks.narrowPeak",s=SAMPLES),
+        expand("results/peaks/chip_macs/bdgcmp/{s}_qpois.bdg",s=SAMPLES),
         #expand("results/mapping/dna_bwa_mem2/{s}.markdup.{f}",s=SAMPLES,f=["bam","bam.bai"])
 
 include: "../../../workflow/rules/utils.smk"
