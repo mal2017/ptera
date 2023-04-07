@@ -13,3 +13,5 @@ sample_modifiers:
         amarel_novo2_r2: /projectsp/genetics/ellison_lab/matt/data/220809_tetf_kd-rnd2-batch1/01.RawData/{fq_r2}
         amarel_novo3_r1: /projectsp/genetics/ellison_lab/matt/data/221003_tetf_kd-round2-batch2-01/01.RawData/{fq_r1}
         amarel_novo3_r2: /projectsp/genetics/ellison_lab/matt/data/221003_tetf_kd-round2-batch2-01/01.RawData/{fq_r2}
+        amarel_novo4_r1: /projectsp/genetics/ellison_lab/matt/data/230221_pangolin_germline_kd/01.RawData/{fq_r1}
+        amarel_novo4_r2: /projectsp/genetics/ellison_lab/matt/data/230221_pangolin_germline_kd/01.RawData/{fq_r2}

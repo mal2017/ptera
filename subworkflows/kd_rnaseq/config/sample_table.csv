@@ -22,3 +22,6 @@ kd_pan_ovary_tj_rep1,pan,40848,tj,50105,female_gonad,amarel_novo3_r1,amarel_novo
 kd_pan_ovary_tj_rep2,pan,26743,tj,50105,female_gonad,amarel_novo3_r1,amarel_novo3_r2
 kd_pan_head_rep1,pan,26743,Mef2.R,25756,female_head,amarel_novo3_r1,amarel_novo3_r2
 kd_pan_head_rep2,pan,26743,Mef2.R,25756,female_head,amarel_novo3_r1,amarel_novo3_r2
+kd_pan_ovary_nos_rep1,pan,26743,nos,25751,female_gonad,amarel_novo4_r1,amarel_novo4_r2
+kd_pan_ovary_nos_rep2,pan,40848,nos,25751,female_gonad,amarel_novo4_r1,amarel_novo4_r2
+gfp_ovary_nos_rep1,control,35786,nos,25751,female_gonad,amarel_novo4_r1,amarel_novo4_r2
